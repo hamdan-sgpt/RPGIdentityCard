@@ -158,12 +158,13 @@ public class IdentityMapRenderer extends MapRenderer {
     }
 
     private Color getRaceGoldColor(String race) {
-        if (race == null) return new Color(229, 192, 123);
+        if (race == null) return Color.WHITE;
         return switch (race.toUpperCase()) {
-            case "ELF" -> new Color(46, 204, 113);
-            case "DWARF" -> new Color(241, 196, 15);
-            case "DEMON" -> new Color(231, 76, 60);
-            default -> new Color(229, 192, 123);
+            case "HUMAN" -> Color.WHITE;               // Putih
+            case "ELF" -> new Color(46, 204, 113);     // Hijau
+            case "DWARF" -> new Color(230, 126, 34);   // Oren
+            case "DEMON" -> new Color(231, 76, 60);    // Merah
+            default -> Color.WHITE;
         };
     }
 
