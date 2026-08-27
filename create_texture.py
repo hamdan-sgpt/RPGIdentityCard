@@ -4,6 +4,7 @@ import subprocess
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
@@ -17,12 +18,12 @@ nama_path = os.path.join(base_dir, "nama.png")
 output_dir = os.path.join(base_dir, "resourcepack", "assets", "minecraft", "textures", "item")
 os.makedirs(output_dir, exist_ok=True)
 
-def create_card_texture(race_name, filename):
+def create_card_texture(race_name, filename, border_color):
     img = Image.new("RGBA", (256, 256), (18, 24, 38, 255))
     draw = ImageDraw.Draw(img)
 
-    # Frame Emas Kerajaan
-    draw.rectangle([4, 4, 251, 251], outline=(229, 192, 123, 255), width=3)
+    # Frame Emas / Warna Ras
+    draw.rectangle([4, 4, 251, 251], outline=border_color, width=3)
     draw.rectangle([8, 8, 247, 247], outline=(97, 175, 239, 255), width=1)
 
     # Tempel logo.png
@@ -44,22 +45,22 @@ def create_card_texture(race_name, filename):
             print("Nama error:", e)
 
     # Garis Pembatas Header
-    draw.line([(14, 70), (242, 70)], fill=(229, 192, 123, 255), width=2)
+    draw.line([(14, 70), (242, 70)], fill=border_color, width=2)
 
     # Frame Pas Foto 3x4 (Tempat Head Skin Player)
-    draw.rectangle([14, 80, 84, 170], fill=(30, 38, 56, 255), outline=(229, 192, 123, 255), width=2)
+    draw.rectangle([14, 80, 84, 170], fill=(30, 38, 56, 255), outline=border_color, width=2)
     draw.text((20, 115), "PAS FOTO\n  (3x4)", fill=(171, 178, 191, 255))
 
     # Teks Data Atribut Kartu
-    draw.text((95, 80), "ID   : ID-7492-9102", fill=(229, 192, 123, 255))
+    draw.text((95, 80), "ID   : ID-VALORIA", fill=border_color)
     draw.text((95, 100), "VERIF: ASLI (RESMI)", fill=(152, 195, 121, 255))
     draw.text((95, 125), "NAMA : RPG PLAYER", fill=(255, 255, 255, 255))
-    draw.text((95, 145), f"RAS  : {race_name.upper()}", fill=(152, 195, 121, 255))
+    draw.text((95, 145), f"RAS  : {race_name.upper()}", fill=border_color)
     draw.text((95, 165), "CLASS: CITIZEN", fill=(255, 255, 255, 255))
 
     # Footer Stempel Kerajaan
     draw.rectangle([14, 185, 242, 242], fill=(24, 32, 48, 255), outline=(97, 175, 239, 255), width=1)
-    draw.text((24, 195), "KERAJAAN VALORIA OFFICIAL IDENTITY CARD", fill=(229, 192, 123, 255))
+    draw.text((24, 195), "KERAJAAN VALORIA OFFICIAL IDENTITY CARD", fill=border_color)
     draw.text((24, 215), "VERIFIED BY ROYAL REGISTRY SYSTEM", fill=(152, 195, 121, 255))
 
     target_path = os.path.join(output_dir, filename)
@@ -67,12 +68,12 @@ def create_card_texture(race_name, filename):
     print("SUCCESSFULLY_CREATED:", target_path)
 
 textures_to_generate = [
-    ("HUMAN", "rpg_card_human.png"),
-    ("ELF", "rpg_card_elf.png"),
-    ("DWARF", "rpg_card_dwarf.png"),
-    ("DEMON", "rpg_card_demon.png"),
-    ("RPG CITIZEN", "rpg_identity_card.png")
+    ("HUMAN", "rpg_card_human.png", (255, 255, 255, 255)),
+    ("ELF", "rpg_card_elf.png", (46, 204, 113, 255)),
+    ("DWARF", "rpg_card_dwarf.png", (230, 126, 34, 255)),
+    ("DEMON", "rpg_card_demon.png", (231, 76, 60, 255)),
+    ("RPG CITIZEN", "rpg_identity_card.png", (255, 255, 255, 255))
 ]
 
-for race, fname in textures_to_generate:
-    create_card_texture(race, fname)
+for race, fname, color_rgb in textures_to_generate:
+    create_card_texture(race, fname, color_rgb)
