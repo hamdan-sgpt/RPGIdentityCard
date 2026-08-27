@@ -8,6 +8,7 @@ import com.rpgidentity.listener.GUIListener;
 import com.rpgidentity.listener.ItemInteractListener;
 import com.rpgidentity.manager.ChatInputManager;
 import com.rpgidentity.manager.IdentityManager;
+import com.rpgidentity.manager.ResourcePackManager;
 import com.rpgidentity.manager.VerificationManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,6 +18,7 @@ public class RPGIdentityPlugin extends JavaPlugin {
     private VerificationManager verificationManager;
     private IdentityManager identityManager;
     private ChatInputManager chatInputManager;
+    private ResourcePackManager resourcePackManager;
 
     @Override
     public void onEnable() {
@@ -25,6 +27,7 @@ public class RPGIdentityPlugin extends JavaPlugin {
         this.verificationManager = new VerificationManager(this);
         this.identityManager = new IdentityManager(this);
         this.chatInputManager = new ChatInputManager();
+        this.resourcePackManager = new ResourcePackManager(this);
 
         // Save default logo.png, nama.png, and mentahan_card.png to plugin data folder if present
         try {
@@ -77,4 +80,5 @@ public class RPGIdentityPlugin extends JavaPlugin {
     public VerificationManager getVerificationManager() { return verificationManager; }
     public IdentityManager getIdentityManager() { return identityManager; }
     public ChatInputManager getChatInputManager() { return chatInputManager; }
+    public ResourcePackManager getResourcePackManager() { return resourcePackManager; }
 }
