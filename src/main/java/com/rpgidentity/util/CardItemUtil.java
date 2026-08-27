@@ -54,7 +54,7 @@ public class CardItemUtil {
             mapView.addRenderer(new IdentityMapRenderer(plugin, data, data.getUuid()));
 
             meta.setMapView(mapView);
-            meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8[" + data.getRace().getDisplayName() + "&8]"));
+            meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8- &f" + data.getNama() + " &8[" + data.getRace().getDisplayName() + "&8]"));
 
             // Attach Persistent Owner UUID
             NamespacedKey ownerKey = new NamespacedKey(plugin, "owner_uuid");
@@ -91,7 +91,7 @@ public class CardItemUtil {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8[" + data.getRace().getDisplayName() + "&8]"));
+            meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8- &f" + data.getNama() + " &8[" + data.getRace().getDisplayName() + "&8]"));
             
             int cmd = data.getRace().getCustomModelData();
             meta.setCustomModelData(cmd);
