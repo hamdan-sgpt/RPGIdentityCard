@@ -24,8 +24,7 @@ public class IdentityMapRenderer extends MapRenderer {
     private final UUID playerUuid;
     private boolean rendered = false;
     private BufferedImage cachedAvatar = null;
-    private BufferedImage cachedLogo = null;
-    private BufferedImage cachedNama = null;
+    private BufferedImage cachedTemplate = null;
 
     public IdentityMapRenderer(RPGIdentityPlugin plugin, IdentityData data, UUID playerUuid) {
         super(true);
@@ -39,15 +38,14 @@ public class IdentityMapRenderer extends MapRenderer {
         if (rendered) return;
         rendered = true;
 
-        // Fetch player head skin avatar & logo/nama images asynchronously
+        // Fetch player head skin avatar & template image asynchronously
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            // Load logo.png & nama.png from all possible disk paths or plugin resources
-            cachedLogo = findImageFile("logo.png");
-            cachedNama = findImageFile("nama.png");
+            // Load mentahan_card.png template
+            cachedTemplate = findImageFile("mentahan_card.png");
 
             // Fetch avatar from mc-heads
             try {
-                URL url = new URL("https://mc-heads.net/avatar/" + playerUuid.toString() + "/32");
+                URL url = new URL("https://mc-heads.net/avatar/" + playerUuid.toString() + "/64");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0");
                 conn.setConnectTimeout(3000);
@@ -89,15 +87,15 @@ public class IdentityMapRenderer extends MapRenderer {
     }
 
     private BufferedImage createDefaultAvatar() {
-        BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
+        BufferedImage img = new BufferedImage(40, 60, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
         g.setColor(new Color(30, 38, 56));
-        g.fillRect(0, 0, 32, 32);
+        g.fillRect(0, 0, 40, 60);
         g.setColor(new Color(229, 192, 123));
-        g.drawRect(0, 0, 31, 31);
+        g.drawRect(0, 0, 39, 59);
         g.setColor(Color.WHITE);
         g.setFont(new Font("Monospaced", Font.BOLD, 8));
-        g.drawString("FOTO", 4, 18);
+        g.drawString("FOTO", 8, 32);
         g.dispose();
         return img;
     }
@@ -113,130 +111,70 @@ public class IdentityMapRenderer extends MapRenderer {
 
         Color bg = new Color(18, 24, 38);
         Color raceColor = getRaceGoldColor(data != null && data.getRace() != null ? data.getRace().getRawName() : "HUMAN");
-        Color blueAccent = new Color(97, 175, 239);
-        Color greenStatus = new Color(152, 195, 121);
-        Color textGray = new Color(171, 178, 191);
 
-        // 1. Dark Navy Background
-        g.setColor(bg);
-        g.fillRect(0, 0, 128, 128);
-
-        // 2. Double Border
-        g.setColor(raceColor);
-        g.drawRect(2, 2, 123, 123);
-        g.setColor(blueAccent);
-        g.drawRect(4, 4, 119, 119);
-
-        // 3. Header Section (logo.png at 6,5 & nama.png at 28,5)
-        if (cachedLogo != null) {
-            g.drawImage(cachedLogo, 6, 5, 20, 20, null);
+        // 1. Draw Template mentahan_card.png or default dark navy background
+        if (cachedTemplate != null) {
+            g.drawImage(cachedTemplate, 0, 0, 128, 128, null);
         } else {
-            // Draw Stylish Royal Shield Crest
-            g.setColor(raceColor);
-            g.fillRoundRect(7, 6, 18, 18, 4, 4);
             g.setColor(bg);
-            g.fillRect(10, 9, 12, 12);
-            g.setColor(blueAccent);
-            g.drawRect(11, 10, 10, 10);
-        }
+            g.fillRect(0, 0, 128, 128);
 
-        if (cachedNama != null) {
-            g.drawImage(cachedNama, 28, 5, 90, 20, null);
-        } else {
-            int textX = 28;
-            g.setFont(new Font("Dialog", Font.BOLD, 9));
             g.setColor(raceColor);
-            g.drawString("KERAJAAN VALORIA", textX, 14);
+            g.drawRect(2, 2, 123, 123);
+            g.setColor(new Color(97, 175, 239));
+            g.drawRect(4, 4, 119, 119);
 
-            g.setFont(new Font("Dialog", Font.BOLD, 7));
-            g.setColor(textGray);
-            g.drawString("KARTU IDENTITAS RESMI", textX, 23);
+            g.setFont(new Font("Monospaced", Font.BOLD, 8));
+            g.setColor(raceColor);
+            g.drawString("VALDORA UNIVERSE", 10, 15);
+            g.drawLine(6, 22, 121, 22);
         }
 
-        // Header Line Separator
-        g.setColor(raceColor);
-        g.drawLine(6, 27, 121, 27);
+        // 2. Pas Foto Skin Player (Placed inside the futuristic FOTO frame at x=10, y=40, width=42, height=70)
+        int photoX = 9;
+        int photoY = 40;
+        int photoWidth = 43;
+        int photoHeight = 70;
 
-        // 4. Pas Foto Skin Player (32x32) at (7, 31)
         if (cachedAvatar != null) {
-            g.drawImage(cachedAvatar, 7, 31, 32, 32, null);
+            g.drawImage(cachedAvatar, photoX, photoY, photoWidth, photoHeight, null);
         } else {
-            g.drawImage(createDefaultAvatar(), 7, 31, 32, 32, null);
+            g.drawImage(createDefaultAvatar(), photoX, photoY, photoWidth, photoHeight, null);
         }
-        g.setColor(raceColor);
-        g.drawRect(6, 30, 34, 34);
 
-        // 5. Metadata Data Attributes (Clean Column Alignment & No Border Overlap)
-        g.setFont(new Font("Dialog", Font.BOLD, 7));
-
-        String idNum = (data != null && data.getIdNumber() != null) ? data.getIdNumber() : "ID-1176-74";
-        if (idNum.length() > 11) {
-            idNum = idNum.substring(0, 11); // Cap length so it never touches the right border
-        }
+        // 3. Render Custom Player Attributes Directly onto Template Slots
+        g.setFont(new Font("Monospaced", Font.BOLD, 7));
 
         String namaChar = (data != null && data.getNama() != null) ? data.getNama() : "Player";
-        if (namaChar.length() > 10) {
-            namaChar = namaChar.substring(0, 10);
-        }
+        if (namaChar.length() > 10) namaChar = namaChar.substring(0, 10);
 
         String rasName = (data != null && data.getRace() != null) ? data.getRace().getRawName() : "Human";
+
         String jobName = (data != null && data.getProfesi() != null) ? data.getProfesi() : "Lumberjack";
-        boolean isAuthentic = plugin.getVerificationManager().isAuthentic(idNum, data != null ? data.getSignatureHash() : "");
+        if (jobName.length() > 10) jobName = jobName.substring(0, 10);
 
-        int y1 = 37, y2 = 46, y3 = 55, y4 = 64, y5 = 73;
+        String idNum = (data != null && data.getIdNumber() != null) ? data.getIdNumber() : "ID-1176-74";
+        if (idNum.length() > 11) idNum = idNum.substring(0, 11);
 
-        // Row 1: ID
-        g.setColor(raceColor);
-        g.drawString("ID", 44, y1);
-        g.drawString(":", 66, y1);
-        g.drawString(idNum, 72, y1);
-
-        // Row 2: VER
-        g.setColor(textGray);
-        g.drawString("VER", 44, y2);
-        g.drawString(":", 66, y2);
-        g.setColor(isAuthentic ? greenStatus : Color.RED);
-        g.drawString(isAuthentic ? "ASLI (RESMI)" : "PALSU", 72, y2);
-
-        // Row 3: NAMA
-        g.setColor(textGray);
-        g.drawString("NAMA", 44, y3);
-        g.drawString(":", 66, y3);
+        // NAMA Value (x = 70, y = 26)
         g.setColor(Color.WHITE);
-        g.drawString(namaChar, 72, y3);
+        g.drawString(namaChar, 70, 26);
 
-        // Row 4: RAS
-        g.setColor(textGray);
-        g.drawString("RAS", 44, y4);
-        g.drawString(":", 66, y4);
+        // RAS Value (x = 70, y = 51)
         g.setColor(raceColor);
-        g.drawString(rasName, 72, y4);
+        g.drawString(rasName, 70, 51);
 
-        // Row 5: JOB
-        g.setColor(textGray);
-        g.drawString("JOB", 44, y5);
-        g.drawString(":", 66, y5);
+        // JOB Value (x = 70, y = 76)
         g.setColor(Color.WHITE);
-        g.drawString(jobName, 72, y5);
+        g.drawString(jobName, 70, 76);
 
-        // Footer Line Separator
+        // ID Value (x = 70, y = 101)
         g.setColor(raceColor);
-        g.drawLine(6, 78, 121, 78);
-
-        // 6. Footer Info
-        g.setFont(new Font("Dialog", Font.BOLD, 7));
-        g.setColor(textGray);
-        g.drawString("UMUR: " + (data != null ? data.getUmur() : 20) + " THN | VALORIA", 10, 88);
-
-        g.setColor(raceColor);
-        g.drawString("OFFICIAL IDENTITY CARD", 10, 98);
-
-        g.setColor(greenStatus);
-        g.drawString("VERIFIED BY ROYAL SYSTEM", 10, 108);
+        g.drawString(idNum, 70, 101);
 
         g.dispose();
 
-        // Render complete image to MapCanvas
+        // Render entire complete image onto MapCanvas
         canvas.drawImage(0, 0, img);
     }
 
