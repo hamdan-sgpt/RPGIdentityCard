@@ -87,13 +87,29 @@ public class CardItemUtil {
 
     public static ItemStack createPaperCardItem(RPGIdentityPlugin plugin, IdentityData data) {
         PluginConfig config = plugin.getPluginConfig();
-        ItemStack item = new ItemStack(config.getItemMaterial());
+        String lowerName = data.getNama() != null ? data.getNama().toLowerCase() : "";
+        ItemStack item = null;
+
+        // Check if ItemsAdder custom item exists
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
+            try {
+                dev.lone.itemsadder.api.CustomStack stack = dev.lone.itemsadder.api.CustomStack.getInstance("valdora:card_" + lowerName);
+                if (stack != null) {
+                    item = stack.getItemStack();
+                }
+            } catch (Exception ignored) {}
+        }
+
+        if (item == null) {
+            item = new ItemStack(config.getItemMaterial());
+        }
+
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
             meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8- &f" + data.getNama() + " &8[" + data.getRace().getDisplayName() + "&8]"));
             
-            int cmd = data.getRace().getCustomModelData();
+            int cmd = data.getCustomModelData() > 0 ? data.getCustomModelData() : data.getRace().getCustomModelData();
             meta.setCustomModelData(cmd);
 
             // Attach Persistent Owner UUID
