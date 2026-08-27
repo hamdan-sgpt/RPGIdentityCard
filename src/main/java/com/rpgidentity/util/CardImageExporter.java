@@ -21,10 +21,10 @@ public class CardImageExporter {
                 // 1. Find mentahan_card.png template
                 BufferedImage template = findImageFile(plugin, "mentahan_card.png");
 
-                // 2. Fetch Player Avatar (64x64)
+                // 2. Fetch Player Avatar (128x128)
                 BufferedImage avatar = null;
                 try {
-                    URL url = new URL("https://mc-heads.net/avatar/" + data.getUuid().toString() + "/64");
+                    URL url = new URL("https://mc-heads.net/avatar/" + data.getUuid().toString() + "/128");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("User-Agent", "Mozilla/5.0");
                     conn.setConnectTimeout(3000);
@@ -34,15 +34,16 @@ public class CardImageExporter {
                     }
                 } catch (Exception ignored) {}
 
-                // 3. Create high resolution image (1920x1130 or native template size)
-                int width = template != null ? template.getWidth() : 1280;
-                int height = template != null ? template.getHeight() : 750;
+                // 3. Native dimensions of mentahan_card.png
+                int width = template != null ? template.getWidth() : 1920;
+                int height = template != null ? template.getHeight() : 1130;
 
                 BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = canvas.createGraphics();
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+                // 4. Draw mentahan_card.png Background
                 if (template != null) {
                     g.drawImage(template, 0, 0, width, height, null);
                 } else {
@@ -50,24 +51,24 @@ public class CardImageExporter {
                     g.fillRect(0, 0, width, height);
                 }
 
-                // 4. Draw Avatar into FOTO Frame (Proportional to template dimensions)
-                int fx = (int) (width * 0.075);
-                int fy = (int) (height * 0.31);
-                int fw = (int) (width * 0.335);
-                int fh = (int) (height * 0.625);
+                // 5. Draw Avatar into FOTO Frame
+                int fx = (int) (width * 0.051);
+                int fy = (int) (height * 0.312);
+                int fw = (int) (width * 0.395);
+                int fh = (int) (height * 0.592);
 
                 if (avatar != null) {
                     g.drawImage(avatar, fx, fy, fw, fh, null);
                 }
 
-                // 5. Draw Attributes Text (NAMA, RAS, JOB, ID)
-                g.setFont(new Font("SansSerif", Font.BOLD, (int) (height * 0.045)));
+                // 6. Draw Attributes Text (NAMA, RAS, JOB, ID)
+                g.setFont(new Font("SansSerif", Font.BOLD, (int) (height * 0.052)));
 
-                int tx = (int) (width * 0.55);
+                int tx = (int) (width * 0.555);
                 int y1 = (int) (height * 0.205);
-                int y2 = (int) (height * 0.405);
-                int y3 = (int) (height * 0.605);
-                int y4 = (int) (height * 0.805);
+                int y2 = (int) (height * 0.408);
+                int y3 = (int) (height * 0.612);
+                int y4 = (int) (height * 0.815);
 
                 String namaChar = data.getNama() != null ? data.getNama() : playerName;
                 String rasName = data.getRace() != null ? data.getRace().getRawName() : "Human";
@@ -92,7 +93,7 @@ public class CardImageExporter {
 
                 g.dispose();
 
-                // 6. Save PNG file to plugins/RPGIdentityCard/cards/<PlayerName>.png
+                // 7. Save PNG file to plugins/RPGIdentityCard/cards/<PlayerName>.png
                 File cardsFolder = new File(plugin.getDataFolder(), "cards");
                 if (!cardsFolder.exists()) {
                     cardsFolder.mkdirs();
@@ -100,7 +101,7 @@ public class CardImageExporter {
 
                 File outputFile = new File(cardsFolder, playerName + ".png");
                 ImageIO.write(canvas, "PNG", outputFile);
-                plugin.getLogger().info("TERSIMPAN FILE KTP PNG: " + outputFile.getAbsolutePath());
+                plugin.getLogger().info("TERSIMPAN KTP PNG HASIL EDIT: " + outputFile.getAbsolutePath());
 
             } catch (Exception e) {
                 plugin.getLogger().warning("Gagal menyimpan file KTP PNG untuk " + playerName + ": " + e.getMessage());
@@ -123,6 +124,12 @@ public class CardImageExporter {
                 } catch (Exception ignored) {}
             }
         }
+        try {
+            InputStream in = plugin.getResource(filename);
+            if (in != null) {
+                return ImageIO.read(in);
+            }
+        } catch (Exception ignored) {}
         return null;
     }
 
