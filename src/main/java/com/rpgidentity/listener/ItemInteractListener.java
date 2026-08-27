@@ -3,6 +3,8 @@ package com.rpgidentity.listener;
 import com.rpgidentity.RPGIdentityPlugin;
 import com.rpgidentity.gui.IdentityCardGUI;
 import com.rpgidentity.model.IdentityData;
+import com.rpgidentity.util.CardItemUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +13,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class ItemInteractListener implements Listener {
 
@@ -26,7 +30,17 @@ public class ItemInteractListener implements Listener {
             ItemStack item = event.getItem();
             if (isCardItem(item)) {
                 event.setCancelled(true);
-                IdentityCardGUI.open(plugin, event.getPlayer(), event.getPlayer());
+                Player viewer = event.getPlayer();
+                Player target = viewer;
+
+                UUID ownerUuid = CardItemUtil.getOwnerUuid(plugin, item);
+                if (ownerUuid != null) {
+                    Player owner = Bukkit.getPlayer(ownerUuid);
+                    if (owner != null) {
+                        target = owner;
+                    }
+                }
+                IdentityCardGUI.open(plugin, viewer, target);
             }
         }
     }
