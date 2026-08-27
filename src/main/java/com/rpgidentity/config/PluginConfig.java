@@ -21,7 +21,8 @@ public class PluginConfig {
     private String giveCardSuccess;
     private String showCardSender;
     private String showCardReceiver;
-    
+    private String cardLocked;
+
     private Material itemMaterial;
     private int customModelData;
     private boolean useCustomMap;
@@ -48,6 +49,7 @@ public class PluginConfig {
         this.giveCardSuccess = colorize(config.getString("messages.give_card_success", "&aBerhasil mengambil Fisik Kartu Identitas milik &e%nama%&a!"));
         this.showCardSender = colorize(config.getString("messages.show_card_sender", "&aKamu menunjukkan Kartu Identitas milikmu kepada &e%target%&a!"));
         this.showCardReceiver = colorize(config.getString("messages.show_card_receiver", "&e%sender% &amenunjukkan Kartu Identitas miliknya kepadamu:"));
+        this.cardLocked = colorize(config.getString("messages.card_locked", "&cKartu Identitas kamu sudah diterbitkan secara resmi dan dikunci! Hubungi Admin jika ingin mengubah data."));
 
         String matStr = config.getString("item.material", "PAPER");
         Material mat = Material.matchMaterial(matStr);
@@ -72,6 +74,7 @@ public class PluginConfig {
     public String getGiveCardSuccess(String nama) { return prefix + giveCardSuccess.replace("%nama%", nama); }
     public String getShowCardSender(String target) { return prefix + showCardSender.replace("%target%", target); }
     public String getShowCardReceiver(String sender) { return prefix + showCardReceiver.replace("%sender%", sender); }
+    public String getCardLocked() { return prefix + cardLocked; }
     public Material getItemMaterial() { return itemMaterial; }
     public int getCustomModelData() { return customModelData; }
     public boolean useCustomMap() { return useCustomMap; }
