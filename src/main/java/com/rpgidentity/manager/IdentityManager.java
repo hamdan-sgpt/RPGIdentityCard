@@ -50,6 +50,7 @@ public class IdentityManager {
                     data.setRace(Race.fromString(dataConfig.getString(path + "race", "HUMAN")));
                     data.setSignatureHash(dataConfig.getString(path + "signatureHash"));
                     data.setRegistered(dataConfig.getBoolean(path + "registered", false));
+                    data.setCustomModelData(dataConfig.getInt(path + "customModelData", 0));
 
                     identityMap.put(uuid, data);
                 } catch (IllegalArgumentException ignored) {}
@@ -69,6 +70,7 @@ public class IdentityManager {
             dataConfig.set(path + "race", data.getRace().name());
             dataConfig.set(path + "signatureHash", data.getSignatureHash());
             dataConfig.set(path + "registered", data.isRegistered());
+            dataConfig.set(path + "customModelData", data.getCustomModelData());
         }
         try {
             dataConfig.save(dataFile);
