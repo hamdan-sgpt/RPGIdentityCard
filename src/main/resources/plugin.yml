@@ -1,0 +1,22 @@
+name: RPGIdentityCard
+version: 1.0.0
+main: com.rpgidentity.RPGIdentityPlugin
+api-version: '1.20'
+author: Antigravity Team
+description: Plugin Kartu Identitas RPG dengan Pas Foto Head Skin, pilihan Ras (Elf, Dwarf, Demon, Human), dan Verifikasi Keaslian ID
+
+commands:
+  identity:
+    description: Membuka Kartu Identitas RPG atau formulir pendaftaran.
+    aliases: [id, ktp, card]
+    usage: /id [lihat|verify|ambil|buat]
+  idadmin:
+    description: Perintah administrator untuk mengelola identitas pemain dan verifikasi ID.
+    permission: identity.admin
+    aliases: [ktpadmin]
+    usage: /idadmin [reset|give|verify|setras|set]
+
+permissions:
+  identity.admin:
+    description: Izin untuk mengakses perintah admin RPG Identity.
+    default: op

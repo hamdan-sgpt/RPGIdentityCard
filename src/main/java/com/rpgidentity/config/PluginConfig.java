@@ -1,0 +1,78 @@
+package com.rpgidentity.config;
+
+import com.rpgidentity.RPGIdentityPlugin;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+
+public class PluginConfig {
+
+    private final RPGIdentityPlugin plugin;
+    
+    private String kingdom;
+    private String city;
+    private String statusBerlaku;
+    private String secretKey;
+    
+    private String prefix;
+    private String noIdSelf;
+    private String noIdOther;
+    private String registrationSuccess;
+    private String giveCardSuccess;
+    private String showCardSender;
+    private String showCardReceiver;
+    
+    private Material itemMaterial;
+    private int customModelData;
+    private boolean useCustomMap;
+
+    public PluginConfig(RPGIdentityPlugin plugin) {
+        this.plugin = plugin;
+        loadConfig();
+    }
+
+    public void loadConfig() {
+        plugin.saveDefaultConfig();
+        plugin.reloadConfig();
+        FileConfiguration config = plugin.getConfig();
+
+        this.kingdom = colorize(config.getString("header.kingdom", "KERAJAAN VALORIA - KARTU IDENTITAS RPG"));
+        this.city = colorize(config.getString("header.city", "KOTA ATLANTA CENTRAL"));
+        this.statusBerlaku = colorize(config.getString("header.status_berlaku", "SEUMUR HIDUP"));
+        this.secretKey = config.getString("security.secret_key", "ValoriaSecretKey2026");
+
+        this.prefix = colorize(config.getString("messages.prefix", "&8[&b&lIDENTITY&8] &r"));
+        this.noIdSelf = colorize(config.getString("messages.no_id_self", "&cKamu belum mendaftar Kartu Identitas! Membuka formulir..."));
+        this.noIdOther = colorize(config.getString("messages.no_id_other", "&cPemain &e%player% &cbelum mendaftar Kartu Identitas."));
+        this.registrationSuccess = colorize(config.getString("messages.registration_success", "&a&lSELAMAT! Kartu Identitas kamu berhasil diterbitkan secara resmi."));
+        this.giveCardSuccess = colorize(config.getString("messages.give_card_success", "&aBerhasil mengambil Fisik Kartu Identitas milik &e%nama%&a!"));
+        this.showCardSender = colorize(config.getString("messages.show_card_sender", "&aKamu menunjukkan Kartu Identitas milikmu kepada &e%target%&a!"));
+        this.showCardReceiver = colorize(config.getString("messages.show_card_receiver", "&e%sender% &amenunjukkan Kartu Identitas miliknya kepadamu:"));
+
+        String matStr = config.getString("item.material", "PAPER");
+        Material mat = Material.matchMaterial(matStr);
+        this.itemMaterial = mat != null ? mat : Material.PAPER;
+        this.customModelData = config.getInt("item.custom_model_data", 20001);
+        this.useCustomMap = config.getBoolean("item.use_custom_map", true);
+    }
+
+    public String colorize(String text) {
+        if (text == null) return "";
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
+    public String getKingdom() { return kingdom; }
+    public String getCity() { return city; }
+    public String getStatusBerlaku() { return statusBerlaku; }
+    public String getSecretKey() { return secretKey; }
+    public String getPrefix() { return prefix; }
+    public String getNoIdSelf() { return prefix + noIdSelf; }
+    public String getNoIdOther(String targetName) { return prefix + noIdOther.replace("%player%", targetName); }
+    public String getRegistrationSuccess() { return prefix + registrationSuccess; }
+    public String getGiveCardSuccess(String nama) { return prefix + giveCardSuccess.replace("%nama%", nama); }
+    public String getShowCardSender(String target) { return prefix + showCardSender.replace("%target%", target); }
+    public String getShowCardReceiver(String sender) { return prefix + showCardReceiver.replace("%sender%", sender); }
+    public Material getItemMaterial() { return itemMaterial; }
+    public int getCustomModelData() { return customModelData; }
+    public boolean useCustomMap() { return useCustomMap; }
+}

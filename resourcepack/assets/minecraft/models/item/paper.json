@@ -1,0 +1,28 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/paper"
+  },
+  "overrides": [
+    {
+      "predicate": { "custom_model_data": 20000 },
+      "model": "item/rpg_identity_card"
+    },
+    {
+      "predicate": { "custom_model_data": 20001 },
+      "model": "item/rpg_card_human"
+    },
+    {
+      "predicate": { "custom_model_data": 20002 },
+      "model": "item/rpg_card_elf"
+    },
+    {
+      "predicate": { "custom_model_data": 20003 },
+      "model": "item/rpg_card_dwarf"
+    },
+    {
+      "predicate": { "custom_model_data": 20004 },
+      "model": "item/rpg_card_demon"
+    }
+  ]
+}
