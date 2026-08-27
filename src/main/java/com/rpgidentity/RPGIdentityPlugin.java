@@ -26,12 +26,15 @@ public class RPGIdentityPlugin extends JavaPlugin {
         this.identityManager = new IdentityManager(this);
         this.chatInputManager = new ChatInputManager();
 
-        // Save default logo.png and nama.png to plugin data folder if present
+        // Save default logo.png, nama.png, and mentahan_card.png to plugin data folder if present
         try {
             saveResource("logo.png", false);
         } catch (Exception ignored) {}
         try {
             saveResource("nama.png", false);
+        } catch (Exception ignored) {}
+        try {
+            saveResource("mentahan_card.png", false);
         } catch (Exception ignored) {}
 
         // Registrasi Commands
