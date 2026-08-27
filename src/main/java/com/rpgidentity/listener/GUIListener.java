@@ -26,29 +26,7 @@ public class GUIListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         String title = event.getView().getTitle();
 
-        // --- GUI Card Viewer ---
-        if (title.contains("IDENTITAS RPG")) {
-            event.setCancelled(true);
-            int slot = event.getRawSlot();
-
-            if (slot == 38) { // Ambil Fisik Kartu
-                player.closeInventory();
-                IdentityData data = plugin.getIdentityManager().getIdentity(player.getUniqueId());
-                if (data != null && data.isRegistered()) {
-                    ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
-                    player.getInventory().addItem(item);
-                    player.sendMessage(plugin.getPluginConfig().getGiveCardSuccess(data.getNama()));
-                }
-            } else if (slot == 40 || slot == 13 || slot == 14 || slot == 15 || slot == 16) { // Edit Data / Klik Slot Atribut
-                player.closeInventory();
-                IdentityFormGUI.open(plugin, player);
-            } else if (slot == 42) { // Tutup
-                player.closeInventory();
-            }
-            return;
-        }
-
-        // --- GUI Form Edit/Registrasi ---
+        // --- GUI Form Edit/Registrasi (Di-check paling awal) ---
         if (title.equals(IdentityFormGUI.TITLE)) {
             event.setCancelled(true);
             int slot = event.getRawSlot();
@@ -97,6 +75,33 @@ public class GUIListener implements Listener {
                     player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
                 }
             }
+            return;
+        }
+
+        // --- GUI Card Viewer ---
+        if (title.equals(IdentityCardGUI.TITLE) || title.contains("VALORIA")) {
+            event.setCancelled(true);
+            int slot = event.getRawSlot();
+
+            if (slot == 38) { // Ambil Fisik Kartu
+                player.closeInventory();
+                IdentityData data = plugin.getIdentityManager().getIdentity(player.getUniqueId());
+                if (data != null && data.isRegistered()) {
+                    ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
+                    player.getInventory().addItem(item);
+                    player.sendMessage(plugin.getPluginConfig().getGiveCardSuccess(data.getNama()));
+                }
+            } else if (slot == 40 || slot == 13 || slot == 14 || slot == 15 || slot == 16) { // Edit Data (Khusus Admin)
+                if (player.hasPermission("identity.admin")) {
+                    player.closeInventory();
+                    IdentityFormGUI.open(plugin, player);
+                } else {
+                    player.sendMessage(plugin.getPluginConfig().getCardLocked());
+                }
+            } else if (slot == 42) { // Tutup
+                player.closeInventory();
+            }
+            return;
         }
     }
 
