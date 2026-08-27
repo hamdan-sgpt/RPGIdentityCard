@@ -5,7 +5,6 @@ import com.rpgidentity.model.IdentityData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
-import org.bukkit.map.MinecraftFont;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
@@ -42,18 +41,10 @@ public class IdentityMapRenderer extends MapRenderer {
 
         // Fetch player head skin avatar & logo/nama images asynchronously
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            // Load logo.png & nama.png
-            try {
-                File logoFile = new File(plugin.getDataFolder(), "logo.png");
-                if (!logoFile.exists()) logoFile = new File("logo.png");
-                if (logoFile.exists()) cachedLogo = ImageIO.read(logoFile);
-            } catch (Exception ignored) {}
-
-            try {
-                File namaFile = new File(plugin.getDataFolder(), "nama.png");
-                if (!namaFile.exists()) namaFile = new File("nama.png");
-                if (namaFile.exists()) cachedNama = ImageIO.read(namaFile);
-            } catch (Exception ignored) {}
+            // Load logo.png
+            cachedLogo = findImageFile("logo.png");
+            // Load nama.png
+            cachedNama = findImageFile("nama.png");
 
             // Fetch avatar from mc-heads
             try {
@@ -74,6 +65,24 @@ public class IdentityMapRenderer extends MapRenderer {
         });
     }
 
+    private BufferedImage findImageFile(String filename) {
+        File[] possibleLocations = new File[]{
+                new File(plugin.getDataFolder(), filename),
+                new File(filename),
+                new File("plugins/RPGIdentityCard/" + filename),
+                new File("d:/codingan/A-skript-ktp/" + filename),
+                new File("d:/codingan/A-skript-ktp/src/main/resources/" + filename)
+        };
+        for (File f : possibleLocations) {
+            if (f.exists()) {
+                try {
+                    return ImageIO.read(f);
+                } catch (Exception ignored) {}
+            }
+        }
+        return null;
+    }
+
     private BufferedImage createDefaultAvatar() {
         BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
@@ -89,39 +98,52 @@ public class IdentityMapRenderer extends MapRenderer {
     }
 
     private void drawToCanvas(MapCanvas canvas) {
-        // 1. Draw Background, Borders, Logo, Banner Name & Avatar Photo Box on BufferedImage
         BufferedImage img = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
 
-        Color bg = new Color(18, 24, 38);
-        Color raceColor = getRaceGoldColor(data.getRace().getRawName());
-        Color blueAccent = new Color(97, 175, 239);
+        // Pixel-sharp rendering hints
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
 
-        // Background
+        Color bg = new Color(18, 24, 38);
+        Color raceColor = getRaceGoldColor(data != null && data.getRace() != null ? data.getRace().getRawName() : "HUMAN");
+        Color blueAccent = new Color(97, 175, 239);
+        Color greenStatus = new Color(152, 195, 121);
+
+        // 1. Dark Navy Background
         g.setColor(bg);
         g.fillRect(0, 0, 128, 128);
 
-        // Crisp Double Border
+        // 2. Double Border
         g.setColor(raceColor);
         g.drawRect(2, 2, 123, 123);
         g.setColor(blueAccent);
         g.drawRect(4, 4, 119, 119);
 
-        // Draw logo.png on top left (6, 5) size 20x20
+        // 3. Header: logo.png (6, 5) & nama.png (28, 5)
         if (cachedLogo != null) {
             g.drawImage(cachedLogo, 6, 5, 20, 20, null);
         }
 
-        // Draw nama.png header banner (28, 5) size 90x20
         if (cachedNama != null) {
             g.drawImage(cachedNama, 28, 5, 90, 20, null);
+        } else {
+            int textX = (cachedLogo != null) ? 28 : 14;
+            g.setFont(new Font("Monospaced", Font.BOLD, 9));
+            g.setColor(raceColor);
+            g.drawString("KERAJAAN VALORIA", textX, 14);
+
+            g.setFont(new Font("Monospaced", Font.BOLD, 7));
+            g.setColor(new Color(171, 178, 191));
+            g.drawString("KARTU IDENTITAS RESMI", textX, 23);
         }
 
         // Header Line Separator
         g.setColor(raceColor);
         g.drawLine(6, 27, 121, 27);
 
-        // Pas Foto Skin Player (32x32) at (7, 31)
+        // 4. Pas Foto Skin Player (32x32) at (7, 31)
         if (cachedAvatar != null) {
             g.drawImage(cachedAvatar, 7, 31, 32, 32, null);
         } else {
@@ -130,37 +152,49 @@ public class IdentityMapRenderer extends MapRenderer {
         g.setColor(raceColor);
         g.drawRect(6, 30, 34, 34);
 
+        // 5. Metadata Data Attributes (x = 43) - NO TRUNCATION!
+        g.setFont(new Font("Monospaced", Font.BOLD, 7));
+
+        String idNum = (data != null && data.getIdNumber() != null) ? data.getIdNumber() : "ID-1176-74";
+        String namaChar = (data != null && data.getNama() != null) ? data.getNama() : "Player";
+        String rasName = (data != null && data.getRace() != null) ? data.getRace().getRawName() : "Human";
+        String jobName = (data != null && data.getProfesi() != null) ? data.getProfesi() : "Lumberjack";
+        boolean isAuthentic = plugin.getVerificationManager().isAuthentic(idNum, data != null ? data.getSignatureHash() : "");
+
+        g.setColor(raceColor);
+        g.drawString("ID  : " + idNum, 43, 37);
+
+        g.setColor(isAuthentic ? greenStatus : Color.RED);
+        g.drawString("VER : " + (isAuthentic ? "ASLI (RESMI)" : "PALSU"), 43, 46);
+
+        g.setColor(Color.WHITE);
+        g.drawString("NAMA: " + namaChar, 43, 55);
+
+        g.setColor(raceColor);
+        g.drawString("RAS : " + rasName, 43, 64);
+
+        g.setColor(Color.WHITE);
+        g.drawString("JOB : " + jobName, 43, 73);
+
         // Footer Line Separator
         g.setColor(raceColor);
         g.drawLine(6, 78, 121, 78);
 
+        // 6. Footer Info
+        g.setFont(new Font("Monospaced", Font.BOLD, 7));
+        g.setColor(new Color(171, 178, 191));
+        g.drawString("UMUR: " + (data != null ? data.getUmur() : 20) + " THN | VALORIA", 10, 88);
+
+        g.setColor(raceColor);
+        g.drawString("OFFICIAL IDENTITY CARD", 10, 98);
+
+        g.setColor(greenStatus);
+        g.drawString("VERIFIED BY ROYAL SYSTEM", 10, 108);
+
         g.dispose();
 
-        // Render base graphics to MapCanvas
+        // Render entire complete image to MapCanvas atomically
         canvas.drawImage(0, 0, img);
-
-        // 2. Render Header & Metadata Text using Bukkit's Native MinecraftFont
-        String c = getRaceColorCode(data.getRace().getRawName());
-        boolean isAuthentic = plugin.getVerificationManager().isAuthentic(data.getIdNumber(), data.getSignatureHash());
-
-        // Header Text (If nama.png is not loaded)
-        if (cachedNama == null) {
-            int textX = (cachedLogo != null) ? 28 : 16;
-            canvas.drawText(textX, 8, MinecraftFont.Font, c + "§lKERAJAAN VALORIA");
-            canvas.drawText(textX, 18, MinecraftFont.Font, "§7KARTU IDENTITAS RESMI");
-        }
-
-        // Metadata Data Attributes (x = 43) - NO UNNECESSARY TRUNCATION!
-        canvas.drawText(43, 31, MinecraftFont.Font, c + "ID  : §f" + truncate(data.getIdNumber(), 12));
-        canvas.drawText(43, 40, MinecraftFont.Font, "§7VER : " + (isAuthentic ? "§aASLI" : "§cPALSU"));
-        canvas.drawText(43, 49, MinecraftFont.Font, "§7NAMA: §f" + truncate(data.getNama(), 12));
-        canvas.drawText(43, 58, MinecraftFont.Font, "§7RAS : " + c + truncate(data.getRace().getRawName(), 12));
-        canvas.drawText(43, 67, MinecraftFont.Font, "§7JOB : §f" + truncate(data.getProfesi(), 12));
-
-        // Footer Text
-        canvas.drawText(10, 83, MinecraftFont.Font, "§7UMUR: §f" + data.getUmur() + " THN §8| §7VALORIA");
-        canvas.drawText(10, 94, MinecraftFont.Font, c + "OFFICIAL IDENTITY CARD");
-        canvas.drawText(10, 105, MinecraftFont.Font, "§aVERIFIED BY ROYAL SYSTEM");
     }
 
     private Color getRaceGoldColor(String race) {
@@ -172,22 +206,5 @@ public class IdentityMapRenderer extends MapRenderer {
             case "DEMON" -> new Color(231, 76, 60);    // Merah
             default -> Color.WHITE;
         };
-    }
-
-    private String getRaceColorCode(String race) {
-        if (race == null) return "§f";
-        return switch (race.toUpperCase()) {
-            case "HUMAN" -> "§f";
-            case "ELF" -> "§a";
-            case "DWARF" -> "§6";
-            case "DEMON" -> "§c";
-            default -> "§f";
-        };
-    }
-
-    private String truncate(String text, int maxLen) {
-        if (text == null) return "";
-        if (text.length() <= maxLen) return text;
-        return text.substring(0, maxLen);
     }
 }
