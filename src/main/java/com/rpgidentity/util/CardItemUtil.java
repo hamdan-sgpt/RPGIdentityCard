@@ -7,15 +7,18 @@ import com.rpgidentity.model.IdentityData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CardItemUtil {
 
@@ -53,6 +56,10 @@ public class CardItemUtil {
             meta.setMapView(mapView);
             meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8[" + data.getRace().getDisplayName() + "&8]"));
 
+            // Attach Persistent Owner UUID
+            NamespacedKey ownerKey = new NamespacedKey(plugin, "owner_uuid");
+            meta.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, data.getUuid().toString());
+
             boolean isAuthentic = plugin.getVerificationManager().isAuthentic(data.getIdNumber(), data.getSignatureHash());
 
             List<String> lore = new ArrayList<>();
@@ -86,9 +93,12 @@ public class CardItemUtil {
         if (meta != null) {
             meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8[" + data.getRace().getDisplayName() + "&8]"));
             
-            // Custom Model Data according to Race (Human=20001, Elf=20002, Dwarf=20003, Demon=20004)
             int cmd = data.getRace().getCustomModelData();
             meta.setCustomModelData(cmd);
+
+            // Attach Persistent Owner UUID
+            NamespacedKey ownerKey = new NamespacedKey(plugin, "owner_uuid");
+            meta.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, data.getUuid().toString());
 
             boolean isAuthentic = plugin.getVerificationManager().isAuthentic(data.getIdNumber(), data.getSignatureHash());
 
@@ -112,6 +122,19 @@ public class CardItemUtil {
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    public static UUID getOwnerUuid(RPGIdentityPlugin plugin, ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return null;
+        ItemMeta meta = item.getItemMeta();
+        NamespacedKey key = new NamespacedKey(plugin, "owner_uuid");
+        if (meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
+            String uuidStr = meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
+            try {
+                return UUID.fromString(uuidStr);
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
     private static String color(String s) {
