@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class IdentityCardGUI {
 
-    public static final String TITLE = color("&9&lKARTA IDENTITAS RPG - VALORIA");
+    public static final String TITLE = color("&9&lKARTU IDENTITAS RPG - VALORIA");
 
     public static void open(RPGIdentityPlugin plugin, Player viewer, Player target) {
         IdentityData data = plugin.getIdentityManager().getIdentity(target.getUniqueId());
@@ -59,31 +59,37 @@ public class IdentityCardGUI {
             skullMeta.setLore(Arrays.asList(
                     color("&7Pemilik : &f" + target.getName()),
                     color("&7Ras     : " + data.getRace().getDisplayName()),
-                    color("&7ID Unik : &e" + data.getIdNumber())
+                    color("&7Status  : " + (isAuthentic ? "&a&l✅ TERVERIFIKASI ASLI" : "&c&l❌ TIDAK SAH / PALSU"))
             ));
             head.setItemMeta(skullMeta);
         }
         inv.setItem(10, head);
 
-        // DATA ATRIBUT KARTU IDENTITAS
-        inv.setItem(13, createItem(Material.PAPER, color("&b&lNAMA KARAKTER"), color("&f" + data.getNama())));
-        inv.setItem(14, createItem(Material.CLOCK, color("&b&lUMUR KARAKTER"), color("&f" + data.getUmur() + " Tahun")));
-        inv.setItem(15, createItem(Material.IRON_PICKAXE, color("&b&lPROFESI / CLASS"), color("&f" + data.getProfesi())));
-        inv.setItem(16, createItem(Material.NETHER_STAR, color("&b&lRAS KARAKTER"), data.getRace().getDisplayName(), data.getRace().getDescription()));
+        // DATA ITEMS (Klik untuk Edit)
+        inv.setItem(12, createItem(Material.NAME_TAG, color("&b&lKODE ID & VERIFIKASI"),
+                color("&e" + data.getIdNumber()),
+                color("&7Verifikasi Keaslian: " + (isAuthentic ? "&a&l✅ ASLI (RESMI)" : "&c&l❌ PALSU / DIPALSUSERKAN")),
+                color("&8Hash: #" + (data.getSignatureHash() != null ? data.getSignatureHash() : "N/A"))));
 
-        // STATUS VERIFIKASI KEASLIAN (SLOT 22)
-        Material statusMat = isAuthentic ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
-        String statusTitle = isAuthentic ? color("&a&l✅ STATUS ID: TERVERIFIKASI RESMI (ASLI)") : color("&c&l❌ STATUS ID: PEMALSUAN / PALSU");
-        inv.setItem(22, createItem(statusMat, statusTitle,
-                color("&7Signature Hash: &8#" + (data.getSignatureHash() != null ? data.getSignatureHash() : "NONE")),
-                color("&7Berlaku Hingga : &a" + config.getStatusBerlaku())));
+        boolean isSelf = viewer.equals(target);
+        String editHint = isSelf ? color("&e&l[ KLIK UNTUK EDIT ]") : "";
 
-        // TOMBOL-TOMBOL NAVIGASI BOTTOM
-        if (viewer.equals(target)) {
-            inv.setItem(38, createItem(Material.CHEST, color("&e&l[ 🎴 AMBIL FISIK KARTU ]"), color("&7Klik untuk mengambil item fisik Kartu Identitas.")));
-            inv.setItem(40, createItem(Material.ANVIL, color("&b&l[ ✏️ EDIT DATA IDENTITAS ]"), color("&7Klik untuk membuka formulir pendaftaran & edit.")));
+        inv.setItem(13, createItem(Material.PAPER, color("&b&lNAMA KARAKTER"), color("&f" + data.getNama()), "", editHint));
+        inv.setItem(14, createItem(Material.CLOCK, color("&b&lUMUR KARAKTER"), color("&f" + data.getUmur() + " Tahun"), "", editHint));
+        inv.setItem(15, createItem(Material.NETHER_STAR, color("&b&lRAS KARAKTER"),
+                data.getRace().getDisplayName(),
+                data.getRace().getDescription(),
+                "", editHint));
+        inv.setItem(16, createItem(Material.IRON_PICKAXE, color("&b&lPROFESI / PEKERJAAN"), color("&f" + data.getProfesi()), "", editHint));
+
+        inv.setItem(22, createItem(Material.SHIELD, color("&b&lBERLAKU HINGGA"), color("&a" + config.getStatusBerlaku())));
+
+        // ACTION BUTTONS
+        if (isSelf) {
+            inv.setItem(38, createItem(Material.HOPPER, color("&a&l[ 🖨️ AMBIL FISIK KARTU ]"), color("&7Klik untuk mengambil Kartu Identitas fisik ke inventory.")));
+            inv.setItem(40, createItem(Material.ANVIL, color("&e&l[ ✏️ EDIT IDENTITAS ]"), color("&7Klik untuk mengedit data Kartu Identitas kamu.")));
         }
-        inv.setItem(42, createItem(Material.BARRIER, color("&c&l[ TUTUP MENU ]"), color("&7Klik untuk menutup GUI.")));
+        inv.setItem(42, createItem(Material.BARRIER, color("&c&l[ ❌ TUTUP ]"), color("&7Klik untuk menutup tampilan.")));
 
         viewer.openInventory(inv);
     }
