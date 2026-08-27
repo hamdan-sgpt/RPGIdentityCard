@@ -90,12 +90,18 @@ public class CardItemUtil {
         String lowerName = data.getNama() != null ? data.getNama().toLowerCase() : "";
         ItemStack item = null;
 
-        // Check if ItemsAdder custom item exists
+        // Check if ItemsAdder custom item exists (Reflection-safe soft depend)
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
             try {
-                dev.lone.itemsadder.api.CustomStack stack = dev.lone.itemsadder.api.CustomStack.getInstance("valdora:card_" + lowerName);
-                if (stack != null) {
-                    item = stack.getItemStack();
+                Class<?> csClass = Class.forName("dev.lone.itemsadder.api.CustomStack");
+                java.lang.reflect.Method getInstanceMethod = csClass.getMethod("getInstance", String.class);
+                Object customStack = getInstanceMethod.invoke(null, "valdora:card_" + lowerName);
+                if (customStack != null) {
+                    java.lang.reflect.Method getItemStackMethod = csClass.getMethod("getItemStack");
+                    ItemStack iaItem = (ItemStack) getItemStackMethod.invoke(customStack);
+                    if (iaItem != null) {
+                        item = iaItem;
+                    }
                 }
             } catch (Exception ignored) {}
         }
