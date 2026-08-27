@@ -19,6 +19,11 @@ public class IdentityFormGUI {
     public static void open(RPGIdentityPlugin plugin, Player player) {
         IdentityData data = plugin.getIdentityManager().getOrCreateIdentity(player);
 
+        if (data.isRegistered() && !player.hasPermission("identity.admin")) {
+            player.sendMessage(plugin.getPluginConfig().getCardLocked());
+            return;
+        }
+
         Inventory inv = Bukkit.createInventory(null, 27, TITLE);
         ItemStack glass = createItem(Material.GRAY_STAINED_GLASS_PANE, color("&f"));
         for (int i = 0; i < 27; i++) {
