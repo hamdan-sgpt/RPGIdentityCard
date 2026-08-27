@@ -83,7 +83,14 @@ public class IdentityCommand implements CommandExecutor, TabCompleter {
                 player.getInventory().addItem(item);
                 player.sendMessage(plugin.getPluginConfig().getGiveCardSuccess(data.getNama()));
             }
-            case "buat", "daftar", "edit" -> IdentityFormGUI.open(plugin, player);
+            case "buat", "daftar", "edit" -> {
+                IdentityData data = plugin.getIdentityManager().getIdentity(player.getUniqueId());
+                if (data != null && data.isRegistered() && !player.hasPermission("identity.admin")) {
+                    player.sendMessage(plugin.getPluginConfig().getCardLocked());
+                    return true;
+                }
+                IdentityFormGUI.open(plugin, player);
+            }
             case "bantuan", "help" -> {
                 player.sendMessage(color("&8&m=================&r &b&lIDENTITY MENU &8&m================="));
                 player.sendMessage(color("&e/id &7- Buka GUI Kartu Identitas milik sendiri."));
