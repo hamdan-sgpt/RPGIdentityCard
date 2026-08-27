@@ -21,6 +21,12 @@ public class CardImageExporter {
                 // 1. Find mentahan_card.png template
                 BufferedImage template = findImageFile(plugin, "mentahan_card.png");
 
+                if (template == null) {
+                    plugin.getLogger().warning("CRITICAL: File mentahan_card.png TIDAK DITEMUKAN! Pastikan mentahan_card.png ada di folder plugins/RPGIdentityCard/ atau src/main/resources/");
+                } else {
+                    plugin.getLogger().info("SUKSES Memuat Template mentahan_card.png (" + template.getWidth() + "x" + template.getHeight() + ")");
+                }
+
                 // 2. Fetch Player Avatar (128x128)
                 BufferedImage avatar = null;
                 try {
@@ -49,6 +55,10 @@ public class CardImageExporter {
                 } else {
                     g.setColor(new Color(18, 24, 38));
                     g.fillRect(0, 0, width, height);
+
+                    // Emergency Fallback Frame
+                    g.setColor(getRaceColor(data.getRace() != null ? data.getRace().getRawName() : "HUMAN"));
+                    g.drawRect(20, 20, width - 40, height - 40);
                 }
 
                 // 5. Draw Avatar into FOTO Frame
@@ -114,20 +124,26 @@ public class CardImageExporter {
                 new File(plugin.getDataFolder(), filename),
                 new File(filename),
                 new File("plugins/RPGIdentityCard/" + filename),
+                new File("D:\\codingan\\A-skript-ktp\\" + filename),
                 new File("d:/codingan/A-skript-ktp/" + filename),
-                new File("d:/codingan/A-skript-ktp/src/main/resources/" + filename)
+                new File("D:\\codingan\\A-skript-ktp\\src\\main\\resources\\" + filename),
+                new File("d:/codingan/A-skript-ktp/src/main/resources/" + filename),
+                new File(System.getProperty("user.dir"), filename),
+                new File(System.getProperty("user.dir"), "plugins/RPGIdentityCard/" + filename)
         };
         for (File f : possibleLocations) {
-            if (f.exists()) {
+            if (f != null && f.exists()) {
                 try {
-                    return ImageIO.read(f);
+                    BufferedImage img = ImageIO.read(f);
+                    if (img != null) return img;
                 } catch (Exception ignored) {}
             }
         }
         try {
             InputStream in = plugin.getResource(filename);
             if (in != null) {
-                return ImageIO.read(in);
+                BufferedImage img = ImageIO.read(in);
+                if (img != null) return img;
             }
         } catch (Exception ignored) {}
         return null;
