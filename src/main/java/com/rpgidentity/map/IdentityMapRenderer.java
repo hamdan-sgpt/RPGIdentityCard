@@ -12,6 +12,7 @@ import org.bukkit.map.MapView;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,6 +25,8 @@ public class IdentityMapRenderer extends MapRenderer {
     private final UUID playerUuid;
     private boolean rendered = false;
     private BufferedImage cachedAvatar = null;
+    private BufferedImage cachedLogo = null;
+    private BufferedImage cachedNama = null;
 
     public IdentityMapRenderer(RPGIdentityPlugin plugin, IdentityData data, UUID playerUuid) {
         super(true);
@@ -37,8 +40,22 @@ public class IdentityMapRenderer extends MapRenderer {
         if (rendered) return;
         rendered = true;
 
-        // Fetch player head skin avatar asynchronously
+        // Fetch player head skin avatar & logo/nama images asynchronously
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            // Load logo.png & nama.png
+            try {
+                File logoFile = new File(plugin.getDataFolder(), "logo.png");
+                if (!logoFile.exists()) logoFile = new File("logo.png");
+                if (logoFile.exists()) cachedLogo = ImageIO.read(logoFile);
+            } catch (Exception ignored) {}
+
+            try {
+                File namaFile = new File(plugin.getDataFolder(), "nama.png");
+                if (!namaFile.exists()) namaFile = new File("nama.png");
+                if (namaFile.exists()) cachedNama = ImageIO.read(namaFile);
+            } catch (Exception ignored) {}
+
+            // Fetch avatar from mc-heads
             try {
                 URL url = new URL("https://mc-heads.net/avatar/" + playerUuid.toString() + "/32");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -72,7 +89,7 @@ public class IdentityMapRenderer extends MapRenderer {
     }
 
     private void drawToCanvas(MapCanvas canvas) {
-        // 1. Draw Background, Borders, Avatar Photo Box & Lines on BufferedImage
+        // 1. Draw Background, Borders, Logo, Banner Name & Avatar Photo Box on BufferedImage
         BufferedImage img = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
 
@@ -89,6 +106,16 @@ public class IdentityMapRenderer extends MapRenderer {
         g.drawRect(2, 2, 123, 123);
         g.setColor(blueAccent);
         g.drawRect(4, 4, 119, 119);
+
+        // Draw logo.png on top left (6, 5) size 20x20
+        if (cachedLogo != null) {
+            g.drawImage(cachedLogo, 6, 5, 20, 20, null);
+        }
+
+        // Draw nama.png header banner (28, 5) size 90x20
+        if (cachedNama != null) {
+            g.drawImage(cachedNama, 28, 5, 90, 20, null);
+        }
 
         // Header Line Separator
         g.setColor(raceColor);
@@ -112,20 +139,23 @@ public class IdentityMapRenderer extends MapRenderer {
         // Render base graphics to MapCanvas
         canvas.drawImage(0, 0, img);
 
-        // 2. Render Text using Bukkit's Native MinecraftFont for 100% Crisp Pixel HD Text
+        // 2. Render Header & Metadata Text using Bukkit's Native MinecraftFont
         String c = getRaceColorCode(data.getRace().getRawName());
         boolean isAuthentic = plugin.getVerificationManager().isAuthentic(data.getIdNumber(), data.getSignatureHash());
 
-        // Header Text
-        canvas.drawText(16, 8, MinecraftFont.Font, c + "§lKERAJAAN VALORIA");
-        canvas.drawText(12, 18, MinecraftFont.Font, "§7KARTU IDENTITAS RESMI");
+        // Header Text (If nama.png is not loaded)
+        if (cachedNama == null) {
+            int textX = (cachedLogo != null) ? 28 : 16;
+            canvas.drawText(textX, 8, MinecraftFont.Font, c + "§lKERAJAAN VALORIA");
+            canvas.drawText(textX, 18, MinecraftFont.Font, "§7KARTU IDENTITAS RESMI");
+        }
 
-        // Metadata Data Attributes (x = 43)
-        canvas.drawText(43, 31, MinecraftFont.Font, c + "ID  : §f" + truncate(data.getIdNumber(), 9));
+        // Metadata Data Attributes (x = 43) - NO UNNECESSARY TRUNCATION!
+        canvas.drawText(43, 31, MinecraftFont.Font, c + "ID  : §f" + truncate(data.getIdNumber(), 12));
         canvas.drawText(43, 40, MinecraftFont.Font, "§7VER : " + (isAuthentic ? "§aASLI" : "§cPALSU"));
-        canvas.drawText(43, 49, MinecraftFont.Font, "§7NAMA: §f" + truncate(data.getNama(), 9));
-        canvas.drawText(43, 58, MinecraftFont.Font, "§7RAS : " + c + truncate(data.getRace().getRawName(), 9));
-        canvas.drawText(43, 67, MinecraftFont.Font, "§7JOB : §f" + truncate(data.getProfesi(), 9));
+        canvas.drawText(43, 49, MinecraftFont.Font, "§7NAMA: §f" + truncate(data.getNama(), 12));
+        canvas.drawText(43, 58, MinecraftFont.Font, "§7RAS : " + c + truncate(data.getRace().getRawName(), 12));
+        canvas.drawText(43, 67, MinecraftFont.Font, "§7JOB : §f" + truncate(data.getProfesi(), 12));
 
         // Footer Text
         canvas.drawText(10, 83, MinecraftFont.Font, "§7UMUR: §f" + data.getUmur() + " THN §8| §7VALORIA");
