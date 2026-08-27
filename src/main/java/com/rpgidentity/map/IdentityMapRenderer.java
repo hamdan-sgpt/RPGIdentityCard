@@ -74,8 +74,10 @@ public class IdentityMapRenderer extends MapRenderer {
         BufferedImage img = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
 
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        // Disable anti-aliasing for sharp, pixel-perfect HD text rendering on 128x128 map
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
 
         // Theme colors per race
         Color bg = new Color(18, 24, 38);
@@ -83,71 +85,71 @@ public class IdentityMapRenderer extends MapRenderer {
         Color blueAccent = new Color(97, 175, 239);
         Color greenStatus = new Color(152, 195, 121);
         Color textWhite = Color.WHITE;
-        Color textGray = new Color(171, 178, 191);
+        Color textGray = new Color(180, 190, 205);
 
-        // 1. Background
+        // 1. Dark Navy Background
         g.setColor(bg);
         g.fillRect(0, 0, 128, 128);
 
-        // 2. Borders
+        // 2. Crisp Double Border
         g.setColor(gold);
         g.drawRect(2, 2, 123, 123);
         g.setColor(blueAccent);
         g.drawRect(4, 4, 119, 119);
 
         // 3. Header
-        g.setFont(new Font("SansSerif", Font.BOLD, 7));
+        g.setFont(new Font("Dialog", Font.BOLD, 9));
         g.setColor(gold);
-        g.drawString("KERAJAAN VALORIA", 22, 13);
-        g.setFont(new Font("SansSerif", Font.PLAIN, 6));
-        g.setColor(textGray);
-        g.drawString("KARTU IDENTITAS RPG RESMI", 16, 21);
-        g.setColor(gold);
-        g.drawLine(7, 24, 120, 24);
+        g.drawString("KERAJAAN VALORIA", 14, 14);
 
-        // 4. Pas Foto Skin Player (32x32) at (8, 28)
+        g.setFont(new Font("Dialog", Font.BOLD, 7));
+        g.setColor(textGray);
+        g.drawString("KARTU IDENTITAS RESMI", 16, 23);
+        g.setColor(gold);
+        g.drawLine(6, 26, 121, 26);
+
+        // 4. Pas Foto Skin Player (32x32) at (7, 30)
         if (cachedAvatar != null) {
-            g.drawImage(cachedAvatar, 8, 28, 32, 32, null);
+            g.drawImage(cachedAvatar, 7, 30, 32, 32, null);
         } else {
-            g.drawImage(createDefaultAvatar(), 8, 28, 32, 32, null);
+            g.drawImage(createDefaultAvatar(), 7, 30, 32, 32, null);
         }
         g.setColor(gold);
-        g.drawRect(7, 27, 34, 34);
+        g.drawRect(6, 29, 34, 34);
 
-        // 5. Data Atribut Kartu KTP
-        g.setFont(new Font("Monospaced", Font.BOLD, 6));
+        // 5. Data Atribut Kartu KTP (Sharp Monospace Pixel Font)
+        g.setFont(new Font("Monospaced", Font.BOLD, 8));
 
         g.setColor(gold);
-        g.drawString("ID   : " + truncate(data.getIdNumber(), 10), 45, 33);
+        g.drawString("ID  :" + truncate(data.getIdNumber(), 9), 43, 36);
 
         boolean isAuthentic = plugin.getVerificationManager().isAuthentic(data.getIdNumber(), data.getSignatureHash());
         g.setColor(isAuthentic ? greenStatus : Color.RED);
-        g.drawString("VERIF: " + (isAuthentic ? "ASLI (RESMI)" : "PALSU"), 45, 41);
+        g.drawString("VER :" + (isAuthentic ? "ASLI(RESMI)" : "PALSU"), 43, 46);
 
         g.setColor(textWhite);
-        g.drawString("NAMA : " + truncate(data.getNama(), 10), 45, 49);
+        g.drawString("NAMA:" + truncate(data.getNama(), 9), 43, 56);
 
         g.setColor(greenStatus);
-        g.drawString("RAS  : " + truncate(data.getRace().getRawName(), 10), 45, 57);
+        g.drawString("RAS :" + truncate(data.getRace().getRawName(), 9), 43, 66);
 
         g.setColor(textWhite);
-        g.drawString("CLASS: " + truncate(data.getProfesi(), 10), 45, 65);
+        g.drawString("JOB :" + truncate(data.getProfesi(), 9), 43, 76);
 
         // 6. Pembatas Line
         g.setColor(gold);
-        g.drawLine(7, 68, 120, 68);
+        g.drawLine(6, 80, 121, 80);
 
         // 7. Footer Info
-        g.setFont(new Font("SansSerif", Font.PLAIN, 5));
+        g.setFont(new Font("Dialog", Font.BOLD, 7));
         g.setColor(textGray);
-        g.drawString("UMUR: " + data.getUmur() + " TAHUN | VALORIA REGISTRY", 10, 75);
+        g.drawString("UMUR: " + data.getUmur() + " THN | VALORIA", 10, 90);
 
-        g.setFont(new Font("SansSerif", Font.BOLD, 5));
         g.setColor(gold);
-        g.drawString("OFFICIAL ROYAL IDENTITY CARD", 18, 83);
+        g.drawString("OFFICIAL IDENTITY CARD", 10, 100);
 
         g.setColor(greenStatus);
-        g.drawString("VERIFIED BY ROYAL SYSTEM #" + truncate(data.getSignatureHash(), 6), 10, 91);
+        g.drawString("VERIFIED BY ROYAL SYSTEM", 10, 110);
 
         g.dispose();
 
