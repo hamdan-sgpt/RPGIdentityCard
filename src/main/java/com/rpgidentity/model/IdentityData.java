@@ -12,6 +12,7 @@ public class IdentityData {
     private Race race;
     private String signatureHash;
     private boolean registered;
+    private int customModelData;
 
     public IdentityData(UUID uuid, String defaultName) {
         this.uuid = uuid;
@@ -22,6 +23,7 @@ public class IdentityData {
         this.race = Race.HUMAN;
         this.signatureHash = null;
         this.registered = false;
+        this.customModelData = 0;
     }
 
     public UUID getUuid() { return uuid; }
@@ -46,4 +48,7 @@ public class IdentityData {
 
     public boolean isRegistered() { return registered; }
     public void setRegistered(boolean registered) { this.registered = registered; }
+
+    public int getCustomModelData() { return customModelData; }
+    public void setCustomModelData(int customModelData) { this.customModelData = customModelData; }
 }
