@@ -24,3 +24,4 @@ item:
   use_custom_map: false
   material: "PAPER"
   custom_model_data: 20001
+  auto_iazip: false
