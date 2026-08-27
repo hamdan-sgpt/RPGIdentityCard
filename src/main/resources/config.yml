@@ -3,7 +3,7 @@
 # ==================================================================== #
 
 header:
-  kingdom: "KERASAAN VALORIA - KARTU IDENTITAS RPG"
+  kingdom: "KERAJAAN VALORIA - KARTU IDENTITAS RPG"
   city: "KOTA ATLANTA CENTRAL"
   status_berlaku: "SEUMUR HIDUP"
 
@@ -18,8 +18,9 @@ messages:
   give_card_success: "&aBerhasil mengambil Fisik Kartu Identitas milik &e%nama%&a!"
   show_card_sender: "&aKamu menunjukkan Kartu Identitas milikmu kepada &e%target%&a!"
   show_card_receiver: "&e%sender% &amenunjukkan Kartu Identitas miliknya kepadamu:"
+  card_locked: "&cKartu Identitas kamu sudah diterbitkan secara resmi dan dikunci! Hubungi Admin jika ingin mengubah data."
 
 item:
-  use_custom_map: true
+  use_custom_map: false
   material: "PAPER"
   custom_model_data: 20001
