@@ -4,6 +4,7 @@ import com.rpgidentity.RPGIdentityPlugin;
 import com.rpgidentity.gui.IdentityCardGUI;
 import com.rpgidentity.gui.IdentityFormGUI;
 import com.rpgidentity.model.IdentityData;
+import com.rpgidentity.util.CardImageExporter;
 import com.rpgidentity.util.CardItemUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -55,6 +56,7 @@ public class GUIListener implements Listener {
                 case 22 -> { // Simpan & Terbitkan Kartu ID
                     player.closeInventory();
                     if (data.getIdNumber() == null) {
+                        data.getIdNumber();
                         data.setIdNumber(plugin.getVerificationManager().generateUniqueID());
                     }
                     String sig = plugin.getVerificationManager().generateSignature(data);
@@ -65,9 +67,13 @@ public class GUIListener implements Listener {
                     plugin.getVerificationManager().registerID(data.getIdNumber(), sig);
                     plugin.getIdentityManager().saveData();
 
+                    // Export edited PNG card image to disk
+                    CardImageExporter.generateAndSaveCardPng(plugin, data, player.getName());
+
                     player.sendMessage(plugin.getPluginConfig().getRegistrationSuccess());
                     player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7ID Resmi Kamu: &e" + data.getIdNumber()));
                     player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7Status ID: &a&l✅ ASLI (TERVERIFIKASI)"));
+                    player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7File KTP PNG tersimpan di folder server &bplugins/RPGIdentityCard/cards/" + player.getName() + ".png&7!"));
                     player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7Gunakan perintah &b/id &7untuk melihat Kartu Identitas milikmu!"));
 
                     ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
@@ -87,6 +93,7 @@ public class GUIListener implements Listener {
                 player.closeInventory();
                 IdentityData data = plugin.getIdentityManager().getIdentity(player.getUniqueId());
                 if (data != null && data.isRegistered()) {
+                    CardImageExporter.generateAndSaveCardPng(plugin, data, player.getName());
                     ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
                     player.getInventory().addItem(item);
                     player.sendMessage(plugin.getPluginConfig().getGiveCardSuccess(data.getNama()));
