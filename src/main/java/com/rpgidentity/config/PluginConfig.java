@@ -26,6 +26,7 @@ public class PluginConfig {
     private Material itemMaterial;
     private int customModelData;
     private boolean useCustomMap;
+    private boolean autoIazip;
 
     public PluginConfig(RPGIdentityPlugin plugin) {
         this.plugin = plugin;
@@ -56,6 +57,7 @@ public class PluginConfig {
         this.itemMaterial = mat != null ? mat : Material.PAPER;
         this.customModelData = config.getInt("item.custom_model_data", 20001);
         this.useCustomMap = config.getBoolean("item.use_custom_map", false);
+        this.autoIazip = config.getBoolean("item.auto_iazip", false);
     }
 
     public String colorize(String text) {
@@ -78,4 +80,5 @@ public class PluginConfig {
     public Material getItemMaterial() { return itemMaterial; }
     public int getCustomModelData() { return customModelData; }
     public boolean useCustomMap() { return useCustomMap; }
+    public boolean isAutoIazip() { return autoIazip; }
 }
