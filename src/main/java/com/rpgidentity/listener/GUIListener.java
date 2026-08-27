@@ -27,7 +27,7 @@ public class GUIListener implements Listener {
         String title = event.getView().getTitle();
 
         // --- GUI Card Viewer ---
-        if (title.equals(IdentityCardGUI.TITLE)) {
+        if (title.contains("IDENTITAS RPG")) {
             event.setCancelled(true);
             int slot = event.getRawSlot();
 
@@ -39,7 +39,7 @@ public class GUIListener implements Listener {
                     player.getInventory().addItem(item);
                     player.sendMessage(plugin.getPluginConfig().getGiveCardSuccess(data.getNama()));
                 }
-            } else if (slot == 40) { // Edit Data
+            } else if (slot == 40 || slot == 13 || slot == 14 || slot == 15 || slot == 16) { // Edit Data / Klik Slot Atribut
                 player.closeInventory();
                 IdentityFormGUI.open(plugin, player);
             } else if (slot == 42) { // Tutup
