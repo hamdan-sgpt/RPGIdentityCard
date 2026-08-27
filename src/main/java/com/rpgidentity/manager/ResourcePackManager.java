@@ -18,6 +18,7 @@ public class ResourcePackManager {
     private final RPGIdentityPlugin plugin;
     private final File packDir;
     private final File zipFile;
+    private boolean iaReloadScheduled = false;
 
     public ResourcePackManager(RPGIdentityPlugin plugin) {
         this.plugin = plugin;
@@ -119,12 +120,17 @@ public class ResourcePackManager {
 
             plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport item YML & tekstur 'valdora:card_" + lowerName + "' berhasil!");
 
-            // Run /iazip asynchronously on main thread
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
-                } catch (Exception ignored) {}
-            });
+            // Run /iazip with a 3-second (60 ticks) batch delay to prevent 'Already reloading' warning
+            if (!iaReloadScheduled) {
+                iaReloadScheduled = true;
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    iaReloadScheduled = false;
+                    try {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
+                        plugin.getLogger().info("ITEMSADDER: /iazip berhasil dieksekusi!");
+                    } catch (Exception ignored) {}
+                }, 60L);
+            }
 
         } catch (Exception e) {
             plugin.getLogger().warning("ItemsAdder Export Warning: " + e.getMessage());
