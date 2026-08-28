@@ -21,6 +21,7 @@ public class IdentityFormGUI {
 
         if (data.isRegistered() && !player.hasPermission("identity.admin")) {
             player.sendMessage(plugin.getPluginConfig().getCardLocked());
+            IdentityCardGUI.open(plugin, player, player);
             return;
         }
 
@@ -43,6 +44,7 @@ public class IdentityFormGUI {
                 "",
                 color("&e&l[ KLIK UNTUK GANTI PEKERJAAN ]"),
                 color("&7Pilihan Pekerjaan: &fLumberjack, Miner, Farmer")));
+
 
         // RAS SELECTION (Click-to-Cycle: Human -> Elf -> Dwarf -> Demon)
         inv.setItem(14, createItem(Material.NETHER_STAR, color("&b&lRAS KARAKTER"),
