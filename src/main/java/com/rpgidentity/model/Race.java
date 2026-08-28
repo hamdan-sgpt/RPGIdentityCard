@@ -3,10 +3,10 @@ package com.rpgidentity.model;
 import org.bukkit.ChatColor;
 
 public enum Race {
-    HUMAN("Human", "&f👤 Human", "&fBangsa Manusia biasa yang serbabisa & adaptif.", 20001),
-    ELF("Elf", "&a🧝 Elf", "&aKaum Bangsa Elf yang lincah, anggun, & berumur panjang.", 20002),
-    DWARF("Dwarf", "&6⛏️ Dwarf", "&6Penempa tangguh dari pegunungan batu bawah tanah.", 20003),
-    DEMON("Demon", "&c👿 Demon", "&cBangsa Iblis bertanduk dengan kekuatan magis kegelapan.", 20004);
+    HUMAN("Human", "&f👤 Human", "&fBangsa Manusia biasa yang serbabisa & adaptif.", 900001),
+    ELF("Elf", "&a🧝 Elf", "&aKaum Bangsa Elf yang lincah, anggun, & berumur panjang.", 900002),
+    DWARF("Dwarf", "&6⛏️ Dwarf", "&6Penempa tangguh dari pegunungan batu bawah tanah.", 900003),
+    DEMON("Demon", "&c👿 Demon", "&cBangsa Iblis bertanduk dengan kekuatan magis kegelapan.", 900004);
 
     private final String rawName;
     private final String displayName;
