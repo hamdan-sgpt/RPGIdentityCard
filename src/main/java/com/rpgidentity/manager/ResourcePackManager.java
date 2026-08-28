@@ -194,16 +194,18 @@ public class ResourcePackManager {
         json.append("  },\n");
         json.append("  \"overrides\": [\n");
 
+        int baseCmd = plugin.getPluginConfig().getCustomModelData();
+        int cmdStart = plugin.getPluginConfig().getPlayerCardCmdStart();
+
         // Static Race Predicates
-        json.append("    { \"predicate\": { \"custom_model_data\": 20001 }, \"model\": \"item/paper\" },\n");
-        json.append("    { \"predicate\": { \"custom_model_data\": 20002 }, \"model\": \"item/paper\" },\n");
-        json.append("    { \"predicate\": { \"custom_model_data\": 20003 }, \"model\": \"item/paper\" },\n");
-        json.append("    { \"predicate\": { \"custom_model_data\": 20004 }, \"model\": \"item/paper\" }");
+        json.append("    { \"predicate\": { \"custom_model_data\": ").append(baseCmd).append(" }, \"model\": \"item/paper\" },\n");
+        json.append("    { \"predicate\": { \"custom_model_data\": ").append(baseCmd + 1).append(" }, \"model\": \"item/paper\" },\n");
+        json.append("    { \"predicate\": { \"custom_model_data\": ").append(baseCmd + 2).append(" }, \"model\": \"item/paper\" },\n");
+        json.append("    { \"predicate\": { \"custom_model_data\": ").append(baseCmd + 3).append(" }, \"model\": \"item/paper\" }");
 
         int assignedCmd = 0;
         File[] modelFiles = cardsDir.listFiles((dir, name) -> name.endsWith(".json"));
         if (modelFiles != null) {
-            int cmdStart = 20100;
             for (File f : modelFiles) {
                 cmdStart++;
                 String nameNoExt = f.getName().replace(".json", "");
