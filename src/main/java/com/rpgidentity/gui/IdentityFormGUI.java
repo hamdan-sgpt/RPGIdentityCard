@@ -54,7 +54,9 @@ public class IdentityFormGUI {
                 color("&e&l[ KLIK UNTUK GANTI RAS ]"),
                 color("&7Pilihan Ras: &fHuman, Elf, Dwarf, Demon")));
 
+        int cost = plugin.getPluginConfig().getRegistrationCost();
         inv.setItem(22, createItem(Material.EMERALD_BLOCK, color("&a&l[ ✅ SIMPAN & TERBITKAN ID ]"),
+                plugin.getPluginConfig().isEconomyEnabled() ? color("&7Biaya Penerbitan: &e" + cost + " Koin") : "",
                 color("&7Klik di sini jika semua data karakter sudah sesuai!")));
 
         player.openInventory(inv);
