@@ -21,7 +21,7 @@ messages:
   card_locked: "&cKartu Identitas kamu sudah diterbitkan secara resmi dan dikunci! Hubungi Admin jika ingin mengubah data."
 
 item:
-  use_custom_map: false
+  use_custom_map: true
   material: "PAPER"
   custom_model_data: 20001
   auto_iazip: false
