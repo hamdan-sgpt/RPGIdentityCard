@@ -87,9 +87,14 @@ public class GUIListener implements Listener {
                     player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7File KTP PNG tersimpan di folder server &bplugins/RPGIdentityCard/cards/" + player.getName() + ".png&7!"));
                     player.sendMessage(color(plugin.getPluginConfig().getPrefix() + "&7Gunakan perintah &b/id &7untuk melihat Kartu Identitas milikmu!"));
 
-                    ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
-                    player.getInventory().addItem(item);
-                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                    // Delay item giving slightly so ItemsAdder export & /iazip finish compiling first
+                    org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        if (player.isOnline()) {
+                            ItemStack item = CardItemUtil.createCardItem(plugin, data, player);
+                            player.getInventory().addItem(item);
+                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                        }
+                    }, 70L);
                 }
             }
             return;
