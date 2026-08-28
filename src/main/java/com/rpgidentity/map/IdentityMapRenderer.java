@@ -2,7 +2,6 @@ package com.rpgidentity.map;
 
 import com.rpgidentity.RPGIdentityPlugin;
 import com.rpgidentity.model.IdentityData;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
@@ -12,8 +11,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
 
@@ -21,171 +18,125 @@ public class IdentityMapRenderer extends MapRenderer {
 
     private final RPGIdentityPlugin plugin;
     private final IdentityData data;
-    private final UUID playerUuid;
+    private final UUID targetUuid;
     private boolean rendered = false;
-    private BufferedImage cachedAvatar = null;
-    private BufferedImage cachedTemplate = null;
 
-    public IdentityMapRenderer(RPGIdentityPlugin plugin, IdentityData data, UUID playerUuid) {
+    public IdentityMapRenderer(RPGIdentityPlugin plugin, IdentityData data, UUID targetUuid) {
         super(true);
         this.plugin = plugin;
         this.data = data;
-        this.playerUuid = playerUuid;
+        this.targetUuid = targetUuid;
     }
 
     @Override
-    public void render(MapView view, MapCanvas canvas, Player player) {
+    public void render(MapView map, MapCanvas canvas, Player player) {
         if (rendered) return;
         rendered = true;
 
-        // Fetch player head skin avatar & template image asynchronously
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            // Load mentahan_card.png template
-            cachedTemplate = findImageFile("mentahan_card.png");
-
-            // Fetch avatar from mc-heads
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                URL url = new URL("https://mc-heads.net/avatar/" + playerUuid.toString() + "/64");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
-                try (InputStream in = conn.getInputStream()) {
-                    cachedAvatar = ImageIO.read(in);
+                BufferedImage cardImage = renderCardImage();
+                if (cardImage != null) {
+                    plugin.getServer().getScheduler().runTask(plugin, () -> {
+                        canvas.drawImage(0, 0, cardImage);
+                    });
                 }
             } catch (Exception e) {
-                cachedAvatar = createDefaultAvatar();
+                plugin.getLogger().warning("Gagal menggambar KTP di Peta: " + e.getMessage());
             }
-
-            // Draw to MapCanvas on main server thread
-            Bukkit.getScheduler().runTask(plugin, () -> drawToCanvas(canvas));
         });
     }
 
-    private BufferedImage findImageFile(String filename) {
-        File[] possibleLocations = new File[]{
-                new File(plugin.getDataFolder(), filename),
-                new File(filename),
-                new File("plugins/RPGIdentityCard/" + filename),
-                new File("d:/codingan/A-skript-ktp/" + filename),
-                new File("d:/codingan/A-skript-ktp/src/main/resources/" + filename)
-        };
-        for (File f : possibleLocations) {
-            if (f.exists()) {
-                try {
-                    return ImageIO.read(f);
-                } catch (Exception ignored) {}
-            }
-        }
+    private BufferedImage renderCardImage() {
         try {
-            InputStream in = plugin.getResource(filename);
-            if (in != null) {
-                return ImageIO.read(in);
+            // 1. Load mentahan_card.png template
+            File templateFile = new File(plugin.getDataFolder(), "mentahan_card.png");
+            BufferedImage template = null;
+            if (templateFile.exists()) {
+                template = ImageIO.read(templateFile);
             }
-        } catch (Exception ignored) {}
-        return null;
-    }
+            if (template == null) {
+                File rootTemplate = new File("mentahan_card.png");
+                if (rootTemplate.exists()) {
+                    template = ImageIO.read(rootTemplate);
+                }
+            }
 
-    private BufferedImage createDefaultAvatar() {
-        BufferedImage img = new BufferedImage(40, 60, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = img.createGraphics();
-        g.setColor(new Color(30, 38, 56));
-        g.fillRect(0, 0, 40, 60);
-        g.setColor(new Color(229, 192, 123));
-        g.drawRect(0, 0, 39, 59);
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Monospaced", Font.BOLD, 8));
-        g.drawString("FOTO", 8, 32);
-        g.dispose();
-        return img;
-    }
+            // Create 128x128 canvas for Minecraft Map
+            BufferedImage mapImg = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = mapImg.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-    private void drawToCanvas(MapCanvas canvas) {
-        BufferedImage img = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = img.createGraphics();
+            if (template != null) {
+                g.drawImage(template, 0, 0, 128, 128, null);
+            } else {
+                g.setColor(new Color(15, 23, 42));
+                g.fillRect(0, 0, 128, 128);
+            }
 
-        // High quality pixel-sharp rendering hints
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+            // 2. Fetch Player Avatar Head
+            BufferedImage avatar = null;
+            try {
+                URL skinUrl = new URL("https://mc-heads.net/avatar/" + targetUuid.toString() + "/64");
+                avatar = ImageIO.read(skinUrl);
+            } catch (Exception ignored) {}
 
-        Color bg = new Color(18, 24, 38);
-        Color raceColor = getRaceGoldColor(data != null && data.getRace() != null ? data.getRace().getRawName() : "HUMAN");
+            // Draw Avatar inside FOTO frame box (x=6, y=40, w=50, h=75)
+            if (avatar != null) {
+                g.drawImage(avatar, 6, 40, 50, 75, null);
+            } else {
+                g.setColor(new Color(30, 41, 59));
+                g.fillRect(6, 40, 50, 75);
+                g.setColor(Color.LIGHT_GRAY);
+                g.setFont(new Font("SansSerif", Font.BOLD, 7));
+                g.drawString("FOTO", 18, 80);
+            }
 
-        // 1. Draw Template mentahan_card.png or default dark navy background
-        if (cachedTemplate != null) {
-            g.drawImage(cachedTemplate, 0, 0, 128, 128, null);
-        } else {
-            g.setColor(bg);
-            g.fillRect(0, 0, 128, 128);
+            // 3. Draw Text Data (Nama, Ras, Job, ID)
+            String charName = data.getNama() != null ? data.getNama() : "Pemain";
+            String raceName = data.getRace() != null ? data.getRace().getDisplayName() : "Human";
+            String jobName = data.getProfesi() != null ? data.getProfesi() : "Lumberjack";
+            String idNum = data.getIdNumber() != null ? data.getIdNumber() : "ID-000-000";
+            if (idNum.length() > 10) {
+                idNum = idNum.substring(0, 10);
+            }
 
+            Color raceColor = Color.CYAN;
+            if (data.getRace() != null) {
+                switch (data.getRace()) {
+                    /* ELF */ case ELF -> raceColor = new Color(34, 197, 94);
+                    /* DWARF */ case DWARF -> raceColor = new Color(249, 115, 22);
+                    /* DEMON */ case DEMON -> raceColor = new Color(239, 68, 68);
+                    /* HUMAN */ default -> raceColor = new Color(59, 130, 246);
+                }
+            }
+
+            g.setFont(new Font("SansSerif", Font.BOLD, 7));
+
+            // Nama Karakter (x = 70, y = 32)
+            g.setColor(Color.WHITE);
+            g.drawString(charName, 70, 32);
+
+            // Ras Karakter (x = 70, y = 54)
             g.setColor(raceColor);
-            g.drawRect(2, 2, 123, 123);
-            g.setColor(new Color(97, 175, 239));
-            g.drawRect(4, 4, 119, 119);
+            g.drawString(raceName, 70, 54);
 
-            g.setFont(new Font("Monospaced", Font.BOLD, 8));
+            // Job Karakter (x = 70, y = 76)
+            g.setColor(Color.WHITE);
+            g.drawString(jobName, 70, 76);
+
+            // ID Value (x = 65, y = 100)
+            g.setFont(new Font("Monospaced", Font.BOLD, 6));
             g.setColor(raceColor);
-            g.drawString("VALDORA UNIVERSE", 10, 15);
-            g.drawLine(6, 22, 121, 22);
+            g.drawString(idNum, 65, 100);
+
+            g.dispose();
+
+            return mapImg;
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error rendering map card image: " + e.getMessage());
+            return null;
         }
-
-        // 2. Pas Foto Skin Player (Placed inside the futuristic FOTO frame at x=10, y=40, width=42, height=70)
-        int photoX = 9;
-        int photoY = 40;
-        int photoWidth = 43;
-        int photoHeight = 70;
-
-        if (cachedAvatar != null) {
-            g.drawImage(cachedAvatar, photoX, photoY, photoWidth, photoHeight, null);
-        } else {
-            g.drawImage(createDefaultAvatar(), photoX, photoY, photoWidth, photoHeight, null);
-        }
-
-        // 3. Render Custom Player Attributes Directly onto Template Slots
-        g.setFont(new Font("Monospaced", Font.BOLD, 7));
-
-        String namaChar = (data != null && data.getNama() != null) ? data.getNama() : "Player";
-        if (namaChar.length() > 10) namaChar = namaChar.substring(0, 10);
-
-        String rasName = (data != null && data.getRace() != null) ? data.getRace().getRawName() : "Human";
-
-        String jobName = (data != null && data.getProfesi() != null) ? data.getProfesi() : "Lumberjack";
-        if (jobName.length() > 10) jobName = jobName.substring(0, 10);
-
-        String idNum = (data != null && data.getIdNumber() != null) ? data.getIdNumber() : "ID-1176-74";
-        if (idNum.length() > 11) idNum = idNum.substring(0, 11);
-
-        // NAMA Value (x = 70, y = 26)
-        g.setColor(Color.WHITE);
-        g.drawString(namaChar, 70, 26);
-
-        // RAS Value (x = 70, y = 51)
-        g.setColor(raceColor);
-        g.drawString(rasName, 70, 51);
-
-        // JOB Value (x = 70, y = 76)
-        g.setColor(Color.WHITE);
-        g.drawString(jobName, 70, 76);
-
-        // ID Value (x = 70, y = 101)
-        g.setColor(raceColor);
-        g.drawString(idNum, 70, 101);
-
-        g.dispose();
-
-        // Render entire complete image onto MapCanvas
-        canvas.drawImage(0, 0, img);
-    }
-
-    private Color getRaceGoldColor(String race) {
-        if (race == null) return Color.WHITE;
-        return switch (race.toUpperCase()) {
-            case "HUMAN" -> Color.WHITE;               // Putih
-            case "ELF" -> new Color(46, 204, 113);     // Hijau
-            case "DWARF" -> new Color(230, 126, 34);   // Oren
-            case "DEMON" -> new Color(231, 76, 60);    // Merah
-            default -> Color.WHITE;
-        };
     }
 }
