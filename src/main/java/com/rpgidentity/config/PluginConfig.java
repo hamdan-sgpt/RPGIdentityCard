@@ -56,7 +56,7 @@ public class PluginConfig {
         Material mat = Material.matchMaterial(matStr);
         this.itemMaterial = mat != null ? mat : Material.PAPER;
         this.customModelData = config.getInt("item.custom_model_data", 20001);
-        this.useCustomMap = config.getBoolean("item.use_custom_map", false);
+        this.useCustomMap = config.getBoolean("item.use_custom_map", true);
         this.autoIazip = config.getBoolean("item.auto_iazip", false);
     }
 
