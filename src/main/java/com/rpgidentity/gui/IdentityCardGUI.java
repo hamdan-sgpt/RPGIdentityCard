@@ -50,11 +50,14 @@ public class IdentityCardGUI {
                 color("&7" + config.getCity()),
                 color("&8ID: &e" + data.getIdNumber())));
 
-        // PAS FOTO 3x4 (PLAYER SKULL HEAD) - Slot 10
+        // PAS FOTO 3x4 (PLAYER SKULL HEAD) - Slot 10 (Supports Offline/Cracked Servers!)
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
         if (skullMeta != null) {
-            skullMeta.setOwningPlayer(target);
+            try {
+                skullMeta.setOwningPlayer(target);
+            } catch (Exception ignored) {}
+            skullMeta.setOwner(target.getName());
             skullMeta.setDisplayName(color("&e&lPAS FOTO KARAKTER (3x4)"));
             skullMeta.setLore(Arrays.asList(
                     color("&7Pemilik : &f" + target.getName()),
@@ -72,7 +75,8 @@ public class IdentityCardGUI {
                 color("&8Hash: #" + (data.getSignatureHash() != null ? data.getSignatureHash() : "N/A"))));
 
         boolean isSelf = viewer.equals(target);
-        String editHint = isSelf ? color("&e&l[ KLIK UNTUK EDIT ]") : "";
+        boolean isAdmin = viewer.hasPermission("identity.admin");
+        String editHint = isAdmin ? color("&e&l[ KLIK UNTUK EDIT (ADMIN) ]") : "";
 
         inv.setItem(13, createItem(Material.PAPER, color("&b&lNAMA KARAKTER"), color("&f" + data.getNama()), "", editHint));
         inv.setItem(14, createItem(Material.CLOCK, color("&b&lUMUR KARAKTER"), color("&f" + data.getUmur() + " Tahun"), "", editHint));
@@ -87,7 +91,9 @@ public class IdentityCardGUI {
         // ACTION BUTTONS
         if (isSelf) {
             inv.setItem(38, createItem(Material.HOPPER, color("&a&l[ 🖨️ AMBIL FISIK KARTU ]"), color("&7Klik untuk mengambil Kartu Identitas fisik ke inventory.")));
-            inv.setItem(40, createItem(Material.ANVIL, color("&e&l[ ✏️ EDIT IDENTITAS ]"), color("&7Klik untuk mengedit data Kartu Identitas kamu.")));
+        }
+        if (isAdmin) {
+            inv.setItem(40, createItem(Material.ANVIL, color("&e&l[ ✏️ EDIT IDENTITAS (ADMIN) ]"), color("&7Klik me-edit data Kartu Identitas ini.")));
         }
         inv.setItem(42, createItem(Material.BARRIER, color("&c&l[ ❌ TUTUP ]"), color("&7Klik untuk menutup tampilan.")));
 
