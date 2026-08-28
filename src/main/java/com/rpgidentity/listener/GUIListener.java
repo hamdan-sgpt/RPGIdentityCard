@@ -53,19 +53,46 @@ public class GUIListener implements Listener {
                     IdentityFormGUI.open(plugin, player);
                 }
                 case 22 -> { // Simpan & Terbitkan Kartu ID
-                    player.closeInventory();
-
-                    // Deduct registration cost via console economy command if enabled
+                    // Deduct registration cost via Vault Economy if enabled
                     if (plugin.getPluginConfig().isEconomyEnabled()) {
                         int cost = plugin.getPluginConfig().getRegistrationCost();
-                        String takeCmd = plugin.getPluginConfig().getEconomyTakeCommand()
-                                .replace("%player%", player.getName())
-                                .replace("%cost%", String.valueOf(cost));
-                        try {
-                            org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), takeCmd);
-                        } catch (Exception ignored) {}
+                        boolean paid = false;
+
+                        // 1. Try Vault Economy API balance check first
+                        if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+                            try {
+                                org.bukkit.plugin.RegisteredServiceProvider<?> rsp = org.bukkit.Bukkit.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy"));
+                                if (rsp != null) {
+                                    Object econ = rsp.getProvider();
+                                    java.lang.reflect.Method hasMethod = econ.getClass().getMethod("has", org.bukkit.OfflinePlayer.class, double.class);
+                                    boolean hasEnough = (boolean) hasMethod.invoke(econ, player, (double) cost);
+                                    if (!hasEnough) {
+                                        player.closeInventory();
+                                        player.sendMessage(plugin.getPluginConfig().getInsufficientFundsMsg());
+                                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                                        return; // BLOCK REGISTRATION IF INSUFFICIENT COINS!
+                                    }
+
+                                    java.lang.reflect.Method withdrawMethod = econ.getClass().getMethod("withdrawPlayer", org.bukkit.OfflinePlayer.class, double.class);
+                                    withdrawMethod.invoke(econ, player, (double) cost);
+                                    paid = true;
+                                }
+                            } catch (Exception ignored) {}
+                        }
+
+                        // 2. Fallback to Console Command if Vault is not present
+                        if (!paid) {
+                            String takeCmd = plugin.getPluginConfig().getEconomyTakeCommand()
+                                    .replace("%player%", player.getName())
+                                    .replace("%cost%", String.valueOf(cost));
+                            try {
+                                org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), takeCmd);
+                            } catch (Exception ignored) {}
+                        }
                         player.sendMessage(plugin.getPluginConfig().getPaidSuccessMsg());
                     }
+
+                    player.closeInventory();
 
                     if (data.getIdNumber() == null) {
                         data.setIdNumber(plugin.getVerificationManager().generateUniqueID());
