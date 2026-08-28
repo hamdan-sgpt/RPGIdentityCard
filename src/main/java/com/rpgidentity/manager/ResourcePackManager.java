@@ -76,12 +76,16 @@ public class ResourcePackManager {
                 }
 
                 // 4. Update paper.json override predicates
-                updatePaperJsonOverrides();
+                int assignedCmd = updatePaperJsonOverrides(lowerName);
+                if (assignedCmd > 0) {
+                    data.setCustomModelData(assignedCmd);
+                    plugin.getIdentityManager().saveData();
+                }
 
                 // 5. Zip resourcepack folder
                 zipPackFolder();
 
-                plugin.getLogger().info("AUTO-UPDATE RESOURCE PACK: Card untuk " + playerName + " berhasil ditambahkan!");
+                plugin.getLogger().info("AUTO-UPDATE RESOURCE PACK: Card untuk " + playerName + " (CustomModelData: " + assignedCmd + ") berhasil ditambahkan!");
 
                 // 6. ItemsAdder Integration (If ItemsAdder plugin folder exists)
                 File itemsAdderDir = new File("plugins/ItemsAdder/contents/valdora");
@@ -120,8 +124,8 @@ public class ResourcePackManager {
 
             plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport item YML & tekstur 'valdora:card_" + lowerName + "' berhasil!");
 
-            // Run /iazip with a 3-second (60 ticks) batch delay to prevent 'Already reloading' warning
-            if (!iaReloadScheduled) {
+            // Run /iazip only if auto_iazip is enabled in config.yml
+            if (plugin.getPluginConfig().isAutoIazip() && !iaReloadScheduled) {
                 iaReloadScheduled = true;
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     iaReloadScheduled = false;
@@ -137,7 +141,7 @@ public class ResourcePackManager {
         }
     }
 
-    private void updatePaperJsonOverrides() {
+    private int updatePaperJsonOverrides(String targetLowerName) {
         File paperJson = new File(packDir, "assets/minecraft/models/item/paper.json");
         File cardsDir = new File(packDir, "assets/minecraft/models/item/cards");
 
@@ -155,13 +159,16 @@ public class ResourcePackManager {
         json.append("    { \"predicate\": { \"custom_model_data\": 20003 }, \"model\": \"item/paper\" },\n");
         json.append("    { \"predicate\": { \"custom_model_data\": 20004 }, \"model\": \"item/paper\" }");
 
-        // Dynamic Player Card Predicates
+        int assignedCmd = 0;
         File[] modelFiles = cardsDir.listFiles((dir, name) -> name.endsWith(".json"));
         if (modelFiles != null) {
             int cmdStart = 20100;
             for (File f : modelFiles) {
                 cmdStart++;
                 String nameNoExt = f.getName().replace(".json", "");
+                if (targetLowerName != null && targetLowerName.equalsIgnoreCase(nameNoExt)) {
+                    assignedCmd = cmdStart;
+                }
                 json.append(",\n    { \"predicate\": { \"custom_model_data\": ").append(cmdStart).append(" }, \"model\": \"item/cards/").append(nameNoExt).append("\" }");
             }
         }
@@ -172,6 +179,8 @@ public class ResourcePackManager {
         try (FileWriter writer = new FileWriter(paperJson)) {
             writer.write(json.toString());
         } catch (Exception ignored) {}
+
+        return assignedCmd;
     }
 
     private void zipPackFolder() {
