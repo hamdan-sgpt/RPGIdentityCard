@@ -1,30 +1,28 @@
-# ==================================================================== #
-#               KONFIGURASI PLUGIN RPG IDENTITY CARD                   #
-# ==================================================================== #
+# ======================================================
+#            RPG IDENTITY CARD CONFIGURATION
+# ======================================================
 
-header:
-  kingdom: "KERAJAAN VALORIA - KARTU IDENTITAS RPG"
-  city: "KOTA ATLANTA CENTRAL"
-  status_berlaku: "SEUMUR HIDUP"
-
-security:
-  secret_key: "ValoriaSecretKey2026"
+card:
+  kingdom: "&b&lKERAJAAN VALDORA"
+  city: "&7KOTA VALORIA"
+  status_berlaku: "&a&lSEUMUR HIDUP"
+  secret_key: "VALDORA-SECRET-SIGNATURE-2026"
 
 messages:
-  prefix: "&8[&b&lIDENTITY&8] &r"
-  no_id_self: "&cKamu belum mendaftar Kartu Identitas! Membuka formulir..."
-  no_id_other: "&cPemain &e%player% &cbelum mendaftar Kartu Identitas."
-  registration_success: "&a&lSELAMAT! Kartu Identitas kamu berhasil diterbitkan secara resmi."
+  prefix: "&8[&bIDENTITY&8] "
+  no_id_self: "&cKamu belum mendaftarkan Kartu Identitas! Menampilkan form pendaftaran..."
+  no_id_other: "&c%player% belum memiliki Kartu Identitas Resmi!"
+  registration_success: "&aKartu Identitas Resmi milikmu telah berhasil terbit!"
   give_card_success: "&aBerhasil mengambil Fisik Kartu Identitas milik &e%nama%&a!"
-  show_card_sender: "&aKamu menunjukkan Kartu Identitas milikmu kepada &e%target%&a!"
-  show_card_receiver: "&e%sender% &amenunjukkan Kartu Identitas miliknya kepadamu:"
-  card_locked: "&cKartu Identitas kamu sudah diterbitkan secara resmi dan dikunci! Hubungi Admin jika ingin mengubah data."
+  show_card_sender: "&aKamu menunjukkan Kartu Identitas milikmu kepada &e%target%&a."
+  show_card_receiver: "&e%sender% &atelah menunjukkan Kartu Identitas miliknya kepadamu."
+  card_locked: "&cKartu Identitas kamu sudah terbit dan terkunci! Hanya Admin yang dapat me-edit data ini."
 
 item:
-  use_custom_map: false
   material: "PAPER"
   custom_model_data: 900001
   player_card_cmd_start: 900100
+  use_custom_map: false
   auto_iazip: true
 
 economy:
@@ -32,3 +30,4 @@ economy:
   cost: 100
   take_command: "economy take %player% %cost%"
   paid_success_msg: "&aBiaya penerbitan KTP sebesar &e%cost% Koin &atelah dipotong!"
+  insufficient_funds_msg: "&c&l[❌] Koin kamu tidak cukup! Kamu membutuhkan &e%cost% Koin &cuntuk membuat KTP!"
