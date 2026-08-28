@@ -25,6 +25,7 @@ public class PluginConfig {
 
     private Material itemMaterial;
     private int customModelData;
+    private int playerCardCmdStart;
     private boolean useCustomMap;
     private boolean autoIazip;
 
@@ -60,7 +61,8 @@ public class PluginConfig {
         String matStr = config.getString("item.material", "PAPER");
         Material mat = Material.matchMaterial(matStr);
         this.itemMaterial = mat != null ? mat : Material.PAPER;
-        this.customModelData = config.getInt("item.custom_model_data", 20001);
+        this.customModelData = config.getInt("item.custom_model_data", 900001);
+        this.playerCardCmdStart = config.getInt("item.player_card_cmd_start", 900100);
         this.useCustomMap = config.getBoolean("item.use_custom_map", false);
         this.autoIazip = config.getBoolean("item.auto_iazip", true);
 
@@ -89,6 +91,7 @@ public class PluginConfig {
     public String getCardLocked() { return prefix + cardLocked; }
     public Material getItemMaterial() { return itemMaterial; }
     public int getCustomModelData() { return customModelData; }
+    public int getPlayerCardCmdStart() { return playerCardCmdStart; }
     public boolean useCustomMap() { return useCustomMap; }
     public boolean isAutoIazip() { return autoIazip; }
 
