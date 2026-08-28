@@ -63,7 +63,7 @@ public class ResourcePackManager {
                 targetTexture.getParentFile().mkdirs();
                 Files.copy(cardPng.toPath(), targetTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-                // 3. Create Model JSON with Wide Rectangular Proportions (Width X: 1.4, Height Y: 0.823 -> Aspect Ratio 1.7:1)
+                // 3. Create Model JSON with Compact Wide Rectangular Proportions (Aspect Ratio 1.7:1 -> Width 0.85, Height 0.50)
                 File targetModel = new File(packDir, "assets/minecraft/models/item/cards/" + lowerName + ".json");
                 targetModel.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(targetModel)) {
@@ -73,13 +73,13 @@ public class ResourcePackManager {
                             "    \"layer0\": \"item/cards/" + lowerName + "\"\n" +
                             "  },\n" +
                             "  \"display\": {\n" +
-                            "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                            "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                            "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                            "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                            "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                            "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                            "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] }\n" +
+                            "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -3.0, 7.5, 0.0 ], \"scale\": [ 0.85, 0.50, 0.85 ] },\n" +
+                            "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 3.0, 7.5, 0.0 ], \"scale\": [ 0.85, 0.50, 0.85 ] },\n" +
+                            "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
                             "  }\n" +
                             "}");
                 }
@@ -128,7 +128,7 @@ public class ResourcePackManager {
             iaTexture.getParentFile().mkdirs();
             Files.copy(cardPng.toPath(), iaTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // 3. Copy Model JSON with custom wide rectangular display transforms to ItemsAdder models folder
+            // 3. Copy Model JSON with compact wide rectangular display transforms to ItemsAdder models folder
             File iaModel = new File(valdoraDir, "models/item/cards/" + lowerName + ".json");
             iaModel.getParentFile().mkdirs();
             try (FileWriter writer = new FileWriter(iaModel)) {
@@ -138,13 +138,13 @@ public class ResourcePackManager {
                         "    \"layer0\": \"valdora:item/cards/" + lowerName + "\"\n" +
                         "  },\n" +
                         "  \"display\": {\n" +
-                        "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                        "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                        "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                        "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                        "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
-                        "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
-                        "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] }\n" +
+                        "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                        "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                        "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -3.0, 7.5, 0.0 ], \"scale\": [ 0.85, 0.50, 0.85 ] },\n" +
+                        "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 3.0, 7.5, 0.0 ], \"scale\": [ 0.85, 0.50, 0.85 ] },\n" +
+                        "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                        "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                        "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
                         "  }\n" +
                         "}");
             }
