@@ -119,7 +119,7 @@ public class ResourcePackManager {
                         "      material: PAPER\n" +
                         "      generate: true\n" +
                         "      textures:\n" +
-                        "        - item/cards/" + lowerName + ".png\n");
+                        "        - item/cards/" + lowerName + "\n");
             }
 
             plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport item YML & tekstur 'valdora:card_" + lowerName + "' berhasil!");
