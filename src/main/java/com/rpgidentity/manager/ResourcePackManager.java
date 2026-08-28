@@ -101,13 +101,26 @@ public class ResourcePackManager {
 
     private void exportToItemsAdder(File cardPng, String lowerName, String displayName) {
         try {
-            // Copy texture to ItemsAdder folder
-            File iaTexture = new File("plugins/ItemsAdder/contents/valdora/textures/item/cards/" + lowerName + ".png");
+            File valdoraDir = new File("plugins/ItemsAdder/contents/valdora");
+            valdoraDir.mkdirs();
+
+            // 1. Write pack.yml if missing (Required for ItemsAdder to recognize namespace)
+            File packYml = new File(valdoraDir, "pack.yml");
+            if (!packYml.exists()) {
+                try (FileWriter writer = new FileWriter(packYml)) {
+                    writer.write("name: Valdora KTP Cards\n" +
+                            "author: RPGIdentityCard\n" +
+                            "version: 1.0.0\n");
+                }
+            }
+
+            // 2. Copy texture to ItemsAdder textures folder
+            File iaTexture = new File(valdoraDir, "textures/item/cards/" + lowerName + ".png");
             iaTexture.getParentFile().mkdirs();
             Files.copy(cardPng.toPath(), iaTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // Generate YML Item Config for ItemsAdder
-            File iaConfig = new File("plugins/ItemsAdder/contents/valdora/configs/cards/" + lowerName + ".yml");
+            // 3. Generate YML Item Config for ItemsAdder
+            File iaConfig = new File(valdoraDir, "configs/cards/" + lowerName + ".yml");
             iaConfig.getParentFile().mkdirs();
             try (FileWriter writer = new FileWriter(iaConfig)) {
                 writer.write("info:\n" +
@@ -122,7 +135,11 @@ public class ResourcePackManager {
                         "        - item/cards/" + lowerName + "\n");
             }
 
-            plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport item YML & tekstur 'valdora:card_" + lowerName + "' berhasil!");
+            // 4. Merge entire resourcepack folder into ItemsAdder's resourcepack subfolder
+            File iaResourcePackDir = new File(valdoraDir, "resourcepack");
+            copyDirectory(packDir, iaResourcePackDir);
+
+            plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport pack.yml, YML item 'valdora:card_" + lowerName + "' & tekstur ke ItemsAdder berhasil!");
 
             // Run /iazip only if auto_iazip is enabled in config.yml
             if (plugin.getPluginConfig().isAutoIazip() && !iaReloadScheduled) {
@@ -138,6 +155,21 @@ public class ResourcePackManager {
 
         } catch (Exception e) {
             plugin.getLogger().warning("ItemsAdder Export Warning: " + e.getMessage());
+        }
+    }
+
+    private void copyDirectory(File sourceDir, File targetDir) throws Exception {
+        if (!sourceDir.exists()) return;
+        if (!targetDir.exists()) targetDir.mkdirs();
+        File[] files = sourceDir.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            File targetFile = new File(targetDir, file.getName());
+            if (file.isDirectory()) {
+                copyDirectory(file, targetFile);
+            } else {
+                Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         }
     }
 
