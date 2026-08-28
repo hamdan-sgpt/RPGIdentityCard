@@ -28,6 +28,11 @@ public class PluginConfig {
     private boolean useCustomMap;
     private boolean autoIazip;
 
+    private boolean economyEnabled;
+    private int registrationCost;
+    private String economyTakeCommand;
+    private String paidSuccessMsg;
+
     public PluginConfig(RPGIdentityPlugin plugin) {
         this.plugin = plugin;
         loadConfig();
@@ -58,6 +63,11 @@ public class PluginConfig {
         this.customModelData = config.getInt("item.custom_model_data", 20001);
         this.useCustomMap = config.getBoolean("item.use_custom_map", false);
         this.autoIazip = config.getBoolean("item.auto_iazip", true);
+
+        this.economyEnabled = config.getBoolean("economy.enabled", true);
+        this.registrationCost = config.getInt("economy.cost", 100);
+        this.economyTakeCommand = config.getString("economy.take_command", "economy take %player% %cost%");
+        this.paidSuccessMsg = colorize(config.getString("economy.paid_success_msg", "&aBiaya penerbitan KTP sebesar &e%cost% Koin &atelah dipotong!"));
     }
 
     public String colorize(String text) {
@@ -81,4 +91,9 @@ public class PluginConfig {
     public int getCustomModelData() { return customModelData; }
     public boolean useCustomMap() { return useCustomMap; }
     public boolean isAutoIazip() { return autoIazip; }
+
+    public boolean isEconomyEnabled() { return economyEnabled; }
+    public int getRegistrationCost() { return registrationCost; }
+    public String getEconomyTakeCommand() { return economyTakeCommand; }
+    public String getPaidSuccessMsg() { return prefix + paidSuccessMsg.replace("%cost%", String.valueOf(registrationCost)); }
 }
