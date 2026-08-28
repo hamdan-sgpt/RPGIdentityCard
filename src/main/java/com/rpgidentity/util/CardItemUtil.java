@@ -87,16 +87,31 @@ public class CardItemUtil {
 
     public static ItemStack createPaperCardItem(RPGIdentityPlugin plugin, IdentityData data) {
         PluginConfig config = plugin.getPluginConfig();
-        String lowerName = data.getNama() != null ? data.getNama().toLowerCase() : "";
+        String accountName = null;
+        if (data.getUuid() != null) {
+            org.bukkit.OfflinePlayer op = Bukkit.getOfflinePlayer(data.getUuid());
+            if (op.getName() != null) accountName = op.getName().toLowerCase();
+        }
+        String charName = data.getNama() != null ? data.getNama().toLowerCase() : "";
+
         ItemStack item = null;
         boolean isItemsAdderItem = false;
-
         // Check if ItemsAdder custom item exists (Reflection-safe soft depend)
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
             try {
                 Class<?> csClass = Class.forName("dev.lone.itemsadder.api.CustomStack");
                 java.lang.reflect.Method getInstanceMethod = csClass.getMethod("getInstance", String.class);
-                Object customStack = getInstanceMethod.invoke(null, "valdora:card_" + lowerName);
+
+                // 1. Try account name (e.g. valdora:card_hamdun_ham)
+                Object customStack = null;
+                if (accountName != null && !accountName.isEmpty()) {
+                    customStack = getInstanceMethod.invoke(null, "valdora:card_" + accountName);
+                }
+                // 2. Fallback to character name (e.g. valdora:card_hamdan)
+                if (customStack == null && !charName.isEmpty()) {
+                    customStack = getInstanceMethod.invoke(null, "valdora:card_" + charName);
+                }
+
                 if (customStack != null) {
                     java.lang.reflect.Method getItemStackMethod = csClass.getMethod("getItemStack");
                     ItemStack iaItem = (ItemStack) getItemStackMethod.invoke(customStack);
