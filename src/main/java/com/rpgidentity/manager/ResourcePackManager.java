@@ -144,9 +144,11 @@ public class ResourcePackManager {
                         "        - item/cards/" + lowerName + "\n");
             }
 
-            // 4. Merge entire resourcepack folder into ItemsAdder's resourcepack subfolder
+            // 4. Remove any legacy conflicting resourcepack folder if present inside ItemsAdder
             File iaResourcePackDir = new File(valdoraDir, "resourcepack");
-            copyDirectory(packDir, iaResourcePackDir);
+            if (iaResourcePackDir.exists()) {
+                deleteDirectory(iaResourcePackDir);
+            }
 
             plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport pack.yml, YML item 'valdora:card_" + lowerName + "' & tekstur ke ItemsAdder berhasil!");
 
@@ -165,6 +167,20 @@ public class ResourcePackManager {
         } catch (Exception e) {
             plugin.getLogger().warning("ItemsAdder Export Warning: " + e.getMessage());
         }
+    }
+
+    private void deleteDirectory(File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        dir.delete();
     }
 
     private void copyDirectory(File sourceDir, File targetDir) throws Exception {
