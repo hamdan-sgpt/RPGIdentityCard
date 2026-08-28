@@ -27,18 +27,8 @@ public class CardImageExporter {
                     plugin.getLogger().info("SUKSES Memuat Template mentahan_card.png (" + template.getWidth() + "x" + template.getHeight() + ")");
                 }
 
-                // 2. Fetch Player Avatar (128x128)
-                BufferedImage avatar = null;
-                try {
-                    URL url = new URL("https://mc-heads.net/avatar/" + data.getUuid().toString() + "/128");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-                    conn.setConnectTimeout(3000);
-                    conn.setReadTimeout(3000);
-                    try (InputStream in = conn.getInputStream()) {
-                        avatar = ImageIO.read(in);
-                    }
-                } catch (Exception ignored) {}
+                // 2. Fetch Player Avatar (128x128) - Supports Offline/Cracked Servers via Player Name!
+                BufferedImage avatar = fetchPlayerAvatar(playerName, data.getUuid().toString());
 
                 // 3. Native dimensions of mentahan_card.png
                 int width = template != null ? template.getWidth() : 1920;
@@ -113,6 +103,9 @@ public class CardImageExporter {
                 ImageIO.write(canvas, "PNG", outputFile);
                 plugin.getLogger().info("TERSIMPAN KTP PNG HASIL EDIT: " + outputFile.getAbsolutePath());
 
+                // Auto-update Resource Pack zip with the newly generated card PNG & model JSON!
+                plugin.getResourcePackManager().addPlayerCardToPack(data, playerName);
+
             } catch (Exception e) {
                 plugin.getLogger().warning("Gagal menyimpan file KTP PNG untuk " + playerName + ": " + e.getMessage());
             }
@@ -158,5 +151,41 @@ public class CardImageExporter {
             case "DEMON" -> new Color(231, 76, 60);
             default -> Color.WHITE;
         };
+    }
+
+    private static BufferedImage fetchPlayerAvatar(String playerName, String uuidStr) {
+        String[] urls = new String[]{
+                "https://mc-heads.net/avatar/" + playerName + "/128",
+                "https://minotar.net/avatar/" + playerName + "/128",
+                "https://mc-heads.net/avatar/" + uuidStr + "/128"
+        };
+        for (String urlStr : urls) {
+            try {
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+                conn.setConnectTimeout(2500);
+                conn.setReadTimeout(2500);
+                try (InputStream in = conn.getInputStream()) {
+                    BufferedImage img = ImageIO.read(in);
+                    if (img != null && img.getWidth() > 0) {
+                        return img;
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+        return createFallbackAvatar(128, 128);
+    }
+
+    private static BufferedImage createFallbackAvatar(int w, int h) {
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(new Color(50, 60, 80));
+        g.fillRect(0, 0, w, h);
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillOval(w / 4, h / 6, w / 2, h / 2);
+        g.fillArc(w / 8, h / 2, (w * 3) / 4, h, 0, 180);
+        g.dispose();
+        return img;
     }
 }
