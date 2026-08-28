@@ -23,7 +23,8 @@ messages:
 item:
   use_custom_map: false
   material: "PAPER"
-  custom_model_data: 20001
+  custom_model_data: 900001
+  player_card_cmd_start: 900100
   auto_iazip: true
 
 economy:
