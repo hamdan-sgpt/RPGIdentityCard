@@ -128,7 +128,7 @@ public class ResourcePackManager {
             iaTexture.getParentFile().mkdirs();
             Files.copy(cardPng.toPath(), iaTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // 3. Generate YML Item Config for ItemsAdder
+            // 3. Generate YML Item Config for ItemsAdder with Custom Display Transforms (Full View Rectangular)
             File iaConfig = new File(valdoraDir, "configs/cards/" + lowerName + ".yml");
             iaConfig.getParentFile().mkdirs();
             try (FileWriter writer = new FileWriter(iaConfig)) {
@@ -141,7 +141,32 @@ public class ResourcePackManager {
                         "      material: PAPER\n" +
                         "      generate: true\n" +
                         "      textures:\n" +
-                        "        - item/cards/" + lowerName + "\n");
+                        "        - item/cards/" + lowerName + "\n" +
+                        "      scale:\n" +
+                        "        firstperson:\n" +
+                        "          right:\n" +
+                        "            scale: [0.75, 0.441, 0.75]\n" +
+                        "            translation: [-3.5, 6.0, 0.0]\n" +
+                        "            rotation: [0, 0, 0]\n" +
+                        "          left:\n" +
+                        "            scale: [0.75, 0.441, 0.75]\n" +
+                        "            translation: [3.5, 6.0, 0.0]\n" +
+                        "            rotation: [0, 0, 0]\n" +
+                        "        thirdperson:\n" +
+                        "          right:\n" +
+                        "            scale: [0.75, 0.441, 0.75]\n" +
+                        "            translation: [0, 2.5, 0]\n" +
+                        "            rotation: [0, 90, -25]\n" +
+                        "          left:\n" +
+                        "            scale: [0.75, 0.441, 0.75]\n" +
+                        "            translation: [0, 2.5, 0]\n" +
+                        "            rotation: [0, -90, 25]\n" +
+                        "        gui:\n" +
+                        "          scale: [1.0, 0.588, 1.0]\n" +
+                        "        ground:\n" +
+                        "          scale: [0.75, 0.441, 0.75]\n" +
+                        "        fixed:\n" +
+                        "          scale: [1.0, 0.588, 1.0]\n");
             }
 
             // 4. Remove any legacy conflicting resourcepack folder if present inside ItemsAdder
@@ -171,13 +196,12 @@ public class ResourcePackManager {
 
     private void deleteDirectory(File dir) {
         File[] files = dir.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteDirectory(f);
-                } else {
-                    f.delete();
-                }
+        if (files == null) return;
+        for (File f : files) {
+            if (f.isDirectory()) {
+                deleteDirectory(f);
+            } else {
+                f.delete();
             }
         }
         dir.delete();
