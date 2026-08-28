@@ -89,6 +89,7 @@ public class CardItemUtil {
         PluginConfig config = plugin.getPluginConfig();
         String lowerName = data.getNama() != null ? data.getNama().toLowerCase() : "";
         ItemStack item = null;
+        boolean isItemsAdderItem = false;
 
         // Check if ItemsAdder custom item exists (Reflection-safe soft depend)
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
@@ -101,6 +102,7 @@ public class CardItemUtil {
                     ItemStack iaItem = (ItemStack) getItemStackMethod.invoke(customStack);
                     if (iaItem != null) {
                         item = iaItem;
+                        isItemsAdderItem = true;
                     }
                 }
             } catch (Exception ignored) {}
@@ -115,8 +117,11 @@ public class CardItemUtil {
         if (meta != null) {
             meta.setDisplayName(color("&b&lKARTU IDENTITAS RPG &8- &f" + data.getNama() + " &8[" + data.getRace().getDisplayName() + "&8]"));
             
-            int cmd = data.getCustomModelData() > 0 ? data.getCustomModelData() : data.getRace().getCustomModelData();
-            meta.setCustomModelData(cmd);
+            // Only set CustomModelData if it's NOT an ItemsAdder item (preserving ItemsAdder CMD!)
+            if (!isItemsAdderItem) {
+                int cmd = data.getCustomModelData() > 0 ? data.getCustomModelData() : data.getRace().getCustomModelData();
+                meta.setCustomModelData(cmd);
+            }
 
             // Attach Persistent Owner UUID
             NamespacedKey ownerKey = new NamespacedKey(plugin, "owner_uuid");
