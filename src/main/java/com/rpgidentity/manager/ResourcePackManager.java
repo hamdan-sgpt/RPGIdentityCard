@@ -171,16 +171,17 @@ public class ResourcePackManager {
 
             plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport pack.yml, model_path, YML item 'valdora:card_" + lowerName + "' & tekstur ke ItemsAdder berhasil!");
 
-            // Run /iazip only if auto_iazip is enabled in config.yml
+            // Run /iareload and /iazip if auto_iazip is enabled in config.yml
             if (plugin.getPluginConfig().isAutoIazip() && !iaReloadScheduled) {
                 iaReloadScheduled = true;
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     iaReloadScheduled = false;
                     try {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iareload");
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
-                        plugin.getLogger().info("ITEMSADDER: /iazip berhasil dieksekusi!");
+                        plugin.getLogger().info("ITEMSADDER: /iareload & /iazip berhasil dieksekusi!");
                     } catch (Exception ignored) {}
-                }, 60L);
+                }, 40L);
             }
 
         } catch (Exception e) {
