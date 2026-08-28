@@ -63,7 +63,7 @@ public class ResourcePackManager {
                 targetTexture.getParentFile().mkdirs();
                 Files.copy(cardPng.toPath(), targetTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-                // 3. Create Model JSON
+                // 3. Create Model JSON with Rectangular Proportions (Aspect ratio ~1.7:1 -> Y scale 0.588)
                 File targetModel = new File(packDir, "assets/minecraft/models/item/cards/" + lowerName + ".json");
                 targetModel.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(targetModel)) {
@@ -71,6 +71,15 @@ public class ResourcePackManager {
                             "  \"parent\": \"item/generated\",\n" +
                             "  \"textures\": {\n" +
                             "    \"layer0\": \"item/cards/" + lowerName + "\"\n" +
+                            "  },\n" +
+                            "  \"display\": {\n" +
+                            "    \"thirdperson_righthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"thirdperson_lefthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"firstperson_righthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"firstperson_lefthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"ground\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"gui\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"fixed\": { \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
                             "  }\n" +
                             "}");
                 }
