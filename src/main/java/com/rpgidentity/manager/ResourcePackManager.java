@@ -73,13 +73,13 @@ public class ResourcePackManager {
                             "    \"layer0\": \"item/cards/" + lowerName + "\"\n" +
                             "  },\n" +
                             "  \"display\": {\n" +
-                            "    \"thirdperson_righthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"thirdperson_lefthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"firstperson_righthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"firstperson_lefthand\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"ground\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"gui\": { \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"fixed\": { \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
+                            "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 2.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 2.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -3.5, 6.0, 0.0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 3.5, 6.0, 0.0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 3.0, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
+                            "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
+                            "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
                             "  }\n" +
                             "}");
                 }
