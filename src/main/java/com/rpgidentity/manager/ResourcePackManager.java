@@ -100,6 +100,9 @@ public class ResourcePackManager {
                 File itemsAdderDir = new File("plugins/ItemsAdder/contents/valdora");
                 if (itemsAdderDir.exists() || Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
                     exportToItemsAdder(cardPng, lowerName, data.getNama());
+                    if (data.getNama() != null && !data.getNama().toLowerCase().equalsIgnoreCase(lowerName)) {
+                        exportToItemsAdder(cardPng, data.getNama().toLowerCase(), data.getNama());
+                    }
                 }
 
             } catch (Exception e) {
