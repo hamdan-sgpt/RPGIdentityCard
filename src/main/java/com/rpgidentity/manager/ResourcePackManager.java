@@ -63,7 +63,7 @@ public class ResourcePackManager {
                 targetTexture.getParentFile().mkdirs();
                 Files.copy(cardPng.toPath(), targetTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-                // 3. Create Model JSON with Rectangular Proportions (Aspect ratio ~1.7:1 -> Y scale 0.588)
+                // 3. Create Model JSON with Wide Rectangular Proportions (Width X: 1.4, Height Y: 0.823 -> Aspect Ratio 1.7:1)
                 File targetModel = new File(packDir, "assets/minecraft/models/item/cards/" + lowerName + ".json");
                 targetModel.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(targetModel)) {
@@ -73,13 +73,13 @@ public class ResourcePackManager {
                             "    \"layer0\": \"item/cards/" + lowerName + "\"\n" +
                             "  },\n" +
                             "  \"display\": {\n" +
-                            "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 2.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
-                            "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 2.5, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
-                            "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -3.5, 6.0, 0.0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
-                            "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 3.5, 6.0, 0.0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
-                            "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 3.0, 0 ], \"scale\": [ 0.75, 0.441, 0.75 ] },\n" +
-                            "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] },\n" +
-                            "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.0, 0.588, 1.0 ] }\n" +
+                            "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                            "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                            "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                            "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                            "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                            "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                            "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] }\n" +
                             "  }\n" +
                             "}");
                 }
@@ -94,7 +94,7 @@ public class ResourcePackManager {
                 // 5. Zip resourcepack folder
                 zipPackFolder();
 
-                plugin.getLogger().info("AUTO-UPDATE RESOURCE PACK: Card untuk " + playerName + " (CustomModelData: " + assignedCmd + ") berhasil ditambahkan!");
+                plugin.getLogger().info("AUTO-UPDATE RESOURCE PACK: Card untuk " + playerName + " berhasil ditambahkan!");
 
                 // 6. ItemsAdder Integration (If ItemsAdder plugin folder exists)
                 File itemsAdderDir = new File("plugins/ItemsAdder/contents/valdora");
@@ -128,7 +128,28 @@ public class ResourcePackManager {
             iaTexture.getParentFile().mkdirs();
             Files.copy(cardPng.toPath(), iaTexture.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // 3. Generate YML Item Config for ItemsAdder with Custom Display Transforms (Full View Rectangular)
+            // 3. Copy Model JSON with custom wide rectangular display transforms to ItemsAdder models folder
+            File iaModel = new File(valdoraDir, "models/item/cards/" + lowerName + ".json");
+            iaModel.getParentFile().mkdirs();
+            try (FileWriter writer = new FileWriter(iaModel)) {
+                writer.write("{\n" +
+                        "  \"parent\": \"item/generated\",\n" +
+                        "  \"textures\": {\n" +
+                        "    \"layer0\": \"valdora:item/cards/" + lowerName + "\"\n" +
+                        "  },\n" +
+                        "  \"display\": {\n" +
+                        "    \"thirdperson_righthand\": { \"rotation\": [ 0, 90, -25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                        "    \"thirdperson_lefthand\": { \"rotation\": [ 0, -90, 25 ], \"translation\": [ 0, 1.5, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                        "    \"firstperson_righthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ -6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                        "    \"firstperson_lefthand\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 6.0, 3.0, 0.0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                        "    \"ground\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 2.0, 0 ], \"scale\": [ 1.2, 0.706, 1.2 ] },\n" +
+                        "    \"gui\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] },\n" +
+                        "    \"fixed\": { \"rotation\": [ 0, 0, 0 ], \"translation\": [ 0, 0, 0 ], \"scale\": [ 1.4, 0.823, 1.4 ] }\n" +
+                        "  }\n" +
+                        "}");
+            }
+
+            // 4. Generate YML Item Config for ItemsAdder linking to model_path
             File iaConfig = new File(valdoraDir, "configs/cards/" + lowerName + ".yml");
             iaConfig.getParentFile().mkdirs();
             try (FileWriter writer = new FileWriter(iaConfig)) {
@@ -139,43 +160,16 @@ public class ResourcePackManager {
                         "    display_name: \"&b&lKARTU IDENTITAS RPG &8- &f" + (displayName != null ? displayName : lowerName) + "\"\n" +
                         "    resource:\n" +
                         "      material: PAPER\n" +
-                        "      generate: true\n" +
-                        "      textures:\n" +
-                        "        - item/cards/" + lowerName + "\n" +
-                        "      scale:\n" +
-                        "        firstperson:\n" +
-                        "          right:\n" +
-                        "            scale: [0.75, 0.441, 0.75]\n" +
-                        "            translation: [-3.5, 6.0, 0.0]\n" +
-                        "            rotation: [0, 0, 0]\n" +
-                        "          left:\n" +
-                        "            scale: [0.75, 0.441, 0.75]\n" +
-                        "            translation: [3.5, 6.0, 0.0]\n" +
-                        "            rotation: [0, 0, 0]\n" +
-                        "        thirdperson:\n" +
-                        "          right:\n" +
-                        "            scale: [0.75, 0.441, 0.75]\n" +
-                        "            translation: [0, 2.5, 0]\n" +
-                        "            rotation: [0, 90, -25]\n" +
-                        "          left:\n" +
-                        "            scale: [0.75, 0.441, 0.75]\n" +
-                        "            translation: [0, 2.5, 0]\n" +
-                        "            rotation: [0, -90, 25]\n" +
-                        "        gui:\n" +
-                        "          scale: [1.0, 0.588, 1.0]\n" +
-                        "        ground:\n" +
-                        "          scale: [0.75, 0.441, 0.75]\n" +
-                        "        fixed:\n" +
-                        "          scale: [1.0, 0.588, 1.0]\n");
+                        "      model_path: item/cards/" + lowerName + "\n");
             }
 
-            // 4. Remove any legacy conflicting resourcepack folder if present inside ItemsAdder
+            // 5. Remove any legacy conflicting resourcepack folder if present inside ItemsAdder
             File iaResourcePackDir = new File(valdoraDir, "resourcepack");
             if (iaResourcePackDir.exists()) {
                 deleteDirectory(iaResourcePackDir);
             }
 
-            plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport pack.yml, YML item 'valdora:card_" + lowerName + "' & tekstur ke ItemsAdder berhasil!");
+            plugin.getLogger().info("ITEMSADDER INTEGRATION: Eksport pack.yml, model_path, YML item 'valdora:card_" + lowerName + "' & tekstur ke ItemsAdder berhasil!");
 
             // Run /iazip only if auto_iazip is enabled in config.yml
             if (plugin.getPluginConfig().isAutoIazip() && !iaReloadScheduled) {
