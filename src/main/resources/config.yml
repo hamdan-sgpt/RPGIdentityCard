@@ -25,3 +25,9 @@ item:
   material: "PAPER"
   custom_model_data: 20001
   auto_iazip: true
+
+economy:
+  enabled: true
+  cost: 100
+  take_command: "economy take %player% %cost%"
+  paid_success_msg: "&aBiaya penerbitan KTP sebesar &e%cost% Koin &atelah dipotong!"
